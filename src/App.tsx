@@ -1,11 +1,12 @@
-import './App.css'
+import "./App.css";
+import Oml2d from "./components/Oml2d";
 
 function App() {
   return (
-      <div className='w-300 h-100 bg-amber-50'>
-      
-      </div>
-  )
+    <div className="min-w-96 h-100 bg-amber-50">
+      <Oml2d />
+    </div>
+  );
 }
 
-export default App
+export default App;
