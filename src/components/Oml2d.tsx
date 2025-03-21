@@ -9,14 +9,16 @@ const Oml2d = memo(() => {
   useEffect(() => {
     const newOml2d = loadOml2d({
       parentElement: oml2dRef.current!,
+      mobileDisplay: true,
       models: [
         {
-          path: "https://registry.npmmirror.com/oml2d-models/latest/files/models/Senko_Normals/senko.model3.json",
+          // path: "https://registry.npmmirror.com/oml2d-models/latest/files/models/Senko_Normals/senko.model3.json",
+          path: "/models/cat-white/model.json",
           position: [0, 0],
           name: "whiteCat",
-          scale: 0.4,
+          scale: 0.2,
           stageStyle: {
-            height: 300,
+            width: 300,
           },
         },
       ],
@@ -45,7 +47,7 @@ const Oml2d = memo(() => {
     newOml2d.loadModelByName("whiteCat");
   }, []);
 
-  return <div></div>;
+  return <div ref={oml2dRef}></div>;
 });
 
 export default Oml2d;
