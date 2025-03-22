@@ -3,12 +3,17 @@
 
 import { CommonStyleType } from "node_modules/oh-my-live2d/dist/types/common";
 import { loadOml2d, Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 
-const Oml2d = memo(() => {
+type Oml2dProps = {
+  oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
+  setOml2d: React.Dispatch<React.SetStateAction<(Oml2dProperties & Oml2dMethods & Oml2dEvents) | null>>;
+}
+
+const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   const oml2dRef = useRef<HTMLDivElement>(null);
   // 修改为使用联合类型，允许初始值为 null
-  const [oml2d, setOml2d] = useState<(Oml2dProperties & Oml2dMethods & Oml2dEvents) | null>(null);
+  // const [oml2d, setOml2d] = useState<(Oml2dProperties & Oml2dMethods & Oml2dEvents) | null>(null);
 
   const getPositionX = () => {
     return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.2 : 120;
@@ -134,7 +139,10 @@ const Oml2d = memo(() => {
     };
   }, []);
 
-  return <div ref={oml2dRef} className="w-full bg-cover bg-center flex justify-center overflow-hidden p-4 pb-0" style={{ backgroundImage: 'url(/images/bg.webp)', aspectRatio: '16 / 9' }}></div>;
+  return <div
+    ref={oml2dRef}
+    className="w-full bg-cover bg-center flex justify-center overflow-hidden p-4 pb-0"
+    style={{ backgroundImage: 'url(/images/bg.webp)', aspectRatio: '16 / 9' }}></div>;
 });
 
 export default Oml2d;

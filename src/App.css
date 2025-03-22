@@ -14,3 +14,7 @@ body {
 #oml2d-stage {
   position: static !important;
 }
+
+.ant-dropdown {
+  z-index: 10000!important;
+}
