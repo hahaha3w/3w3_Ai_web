@@ -1,4 +1,5 @@
 import Activity from '@/components/home/Activity/Activity'
+import Memoir from '@/components/home/Memoirs/Memoir'
 import AIStatus from '@/components/home/Status'
 import UserCard from '@/components/home/UserCard'
 import React from 'react'
@@ -9,6 +10,7 @@ const HomePage = () => {
       <UserCard></UserCard>
       <AIStatus></AIStatus>
       <Activity></Activity>
+      <Memoir></Memoir>
     </div>
   )
 }

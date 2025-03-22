@@ -13,10 +13,9 @@ const Activity: FC = () => {
       <p className="text-xl font-bold">最近活动(展示最近15条)</p>
       <div className="w-full flex grow flex-col gap-4 overflow-auto">
       {mockData.map((data) => {
-        return <ActivityCard {...data}></ActivityCard>
+        return <ActivityCard {...data} id={data.id}></ActivityCard>
       })}
       </div>
-      
     </div>
   )
 }
