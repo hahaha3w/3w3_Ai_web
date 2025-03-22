@@ -4,6 +4,7 @@
 import { CommonStyleType } from "node_modules/oh-my-live2d/dist/types/common";
 import { loadOml2d, Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import { memo, useEffect, useRef } from "react";
+import styles from "./Oml2d.module.scss";
 
 type Oml2dProps = {
   oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
@@ -12,15 +13,21 @@ type Oml2dProps = {
 
 const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   const oml2dRef = useRef<HTMLDivElement>(null);
-  // 修改为使用联合类型，允许初始值为 null
-  // const [oml2d, setOml2d] = useState<(Oml2dProperties & Oml2dMethods & Oml2dEvents) | null>(null);
 
   const getPositionX = () => {
+    if (window.innerWidth < 768) {
+      return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.05 : 120;
+    }
     return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.2 : 120;
   };
 
   const getScale = () => {
-    return oml2dRef.current ? oml2dRef.current.offsetHeight * 0.0005 : 0.2;
+    if (window.innerWidth < 768) {
+      const scale = oml2dRef.current ? oml2dRef.current.offsetWidth * 0.0005 : 0.2;
+      return scale > 0.25 ? 0.25 : scale;
+    }
+    const scale = oml2dRef.current ? oml2dRef.current.offsetHeight * 0.0005 : 0.2;
+    return scale > 0.3 ? 0.3 : scale;
   }
 
   useEffect(() => {
@@ -37,7 +44,7 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
     }
     const stageStyle: CommonStyleType = {
       width: "100%",
-      height: "100%",
+      height: "100%"
     }
     if (oml2d) {
       // @ts-ignore
@@ -99,7 +106,6 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
     });
 
     newOml2d.onLoad((state) => {
-      console.log(state);
       switch (state) {
         case "success":
           console.log("加载成功");
@@ -133,21 +139,21 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   }, [oml2d])
 
   useEffect(() => {
-    const handleResize = () => {
-      oml2d?.setModelPosition({ x: getPositionX() })
-      oml2d?.setModelScale(getScale());
-    };
 
+    const handleResize = () => {
+      // 直接更新模型位置和缩放
+      oml2d?.setModelPosition({ x: getPositionX() });
+      oml2d?.setModelScale(getScale());
+    }
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [oml2d]); // 添加依赖项
 
   return <div
     ref={oml2dRef}
-    className="w-full bg-cover bg-center flex justify-center overflow-hidden p-4 pb-0"
-    style={{ backgroundImage: 'url(/images/bg.webp)', aspectRatio: '16 / 9' }}></div>;
+    className={`w-full bg-cover bg-center flex justify-center overflow-hidden pt-8 ${styles.container}`}></div>;
 });
 
 export default Oml2d;

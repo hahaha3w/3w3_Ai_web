@@ -1,0 +1,11 @@
+.container {
+  background-image: url(/images/bg.webp);
+  aspect-ratio: 16 / 9;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    aspect-ratio: unset;
+    // min-height: 720px;
+    height: 80vh;
+  }
+}

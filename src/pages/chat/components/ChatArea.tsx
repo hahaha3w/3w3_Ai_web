@@ -1,9 +1,10 @@
 import Oml2d from '@/components/Oml2d';
-import { Bubble } from '@ant-design/x';
+import { Bubble, Sender } from '@ant-design/x';
+
 import { Icon } from '@iconify-icon/react/dist/iconify.js';
-import { ConfigProvider, Dropdown, MenuProps, theme } from 'antd';
+import { ConfigProvider, Dropdown, GetProp, GetRef, MenuProps, theme, Tooltip } from 'antd';
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from 'oh-my-live2d';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './ChatArea.module.scss';
 
 type HeaderProps = {
@@ -48,54 +49,80 @@ const Header = ({ title, oml2d }: HeaderProps) => {
   )
 }
 
+const rolesAsObject: GetProp<typeof Bubble.List, 'roles'> = {
+  ai: {
+    placement: 'start',
+    typing: { step: 5, interval: 20 },
+    style: {
+      maxWidth: 600,
+    },
+    shape: 'round',
+    styles: {
+      content: {
+        color: 'white',
+        background: 'rgba(0,0,0,0.5)',
+      }
+    },
+  },
+  user: {
+    placement: 'end',
+    shape: 'round',
+    styles: {
+      content: {
+        color: 'white',
+        background: 'rgba(0,0,0,0.5)',
+      }
+    },
+  },
+};
+
 const MessageList: React.FC = () => {
-  // const listRef = useRef<GetRef<typeof Bubble.List>>(null);
+  const listRef = useRef<GetRef<typeof Bubble.List>>(null);
+  const [value, setValue] = useState('');
+  const [loading, setLoading] = useState(false);
+
   return (
     <div className='w-full h-full box-border flex justify-end flex-col top-0 absolute p-4  z-10000'>
-      <div><Bubble
-        placement="start"
-        content="我是可爱的小猫咪，喵喵喵~"
-        shape='round'
-        styles={{
-          content: {
-            color: 'white',
-            background: 'rgba(0,0,0,0.5)',
-          }
-        }}
-      />
-        <Bubble
-          placement="end"
-          content="你好，猫娘"
-          shape='round'
-          styles={{
-            content: {
-              color: 'white',
-              background: 'rgba(0,0,0,0.5)',
-            }
-          }}
-        />
-        <Bubble
-          placement="start"
-          content="你才是猫娘，你全家都是猫娘！"
-          shape='round'
-          styles={{
-            content: {
-              color: 'white',
-              background: 'rgba(0,0,0,0.5)',
-            }
-          }}
-        /></div>
-      {/* <Bubble.List
+      <Bubble.List
         ref={listRef}
         style={{ maxHeight: 300 }}
-        roles={useRolesAsFunction ? rolesAsFunction : rolesAsObject}
-        items={Array.from({ length: count }).map((_, i) => {
-          const isAI = !!(i % 2);
-          const content = isAI ? 'Mock AI content. '.repeat(20) : 'Mock user content.';
+        roles={rolesAsObject}
+        items={[
+          { key: 1, role: 'ai', content: "我是可爱的小猫咪，喵喵喵~" },
+          { key: 1, role: 'user', content: "你好，猫娘" },
+          { key: 1, role: 'ai', content: "你才是猫娘，你全家都是猫娘！" },
+        ]}
+      />
+      <Sender
+        value={value}
+        onChange={setValue}
+        loading={loading}
+        onSubmit={() => {
+          setValue('');
+          setLoading(true);
+        }}
+        placeholder='聊点什么呢？'
+        onCancel={() => {
+          setLoading(false);
+        }}
+        actions={(_, info) => {
+          const { SendButton } = info.components;
 
-          return { key: i, role: isAI ? 'ai' : 'user', content };
-        })}
-      /> */}
+          if (loading) {
+            return (
+              <Tooltip title="Sending...">
+                <SendButton />
+              </Tooltip>
+            );
+          }
+
+          return (
+            <Tooltip title={value ? 'Send \u21B5' : 'Please type something'}>
+              <SendButton />
+            </Tooltip>
+          );
+        }}
+      />
     </div>
   )
 }
