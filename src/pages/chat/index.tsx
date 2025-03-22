@@ -1,10 +1,11 @@
-import Oml2d from '@/components/Oml2d'
-import React from 'react'
+import { useState } from 'react'
+import ChatArea from './components/ChatArea'
 
 const ChatPage = () => {
+  const [title, setTitle] = useState<string>('Chat Title')
   return (
-    <div>
-      <Oml2d />
+    <div className='w-full'>
+      <ChatArea title={title} />
     </div>
   )
 }
