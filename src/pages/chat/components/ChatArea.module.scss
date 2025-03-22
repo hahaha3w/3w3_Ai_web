@@ -5,3 +5,34 @@
     }
   }
 }
+
+.bubbleListContainer {
+  position: relative;
+  max-height: calc(100% - 178px);
+  overflow-y: auto;
+  
+  /* 自定义滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;  /* 滚动条宽度 */
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);  /* 滚动条轨道背景 */
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);  /* 滚动条滑块颜色 */
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);  /* 悬停时滑块颜色 */
+  }
+  
+}
+
+// .sendButton {
+
+// }
