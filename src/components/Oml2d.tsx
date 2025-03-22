@@ -26,12 +26,18 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   useEffect(() => {
     const tipsStyle: CommonStyleType = {
       borderRadius: "50px",
-      backgroundColor: "#000000",
+      backgroundColor: "rgba(255,255,255, 0.1)", // 设置背景颜色为黑色，透明度为 0.5
+      backdropFilter: "blur(10px)", // 添加模糊效果
+      color: "#ffffff", // 添加文字颜色为白色
+      border: "none", // 移除边框
+      padding: "10px 20px", // 添加内边距
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // 添加阴影效果
+      fontSize: "18px", // 设置字体大小
+      textAlign: "center", // 文字居中对齐
     }
     const stageStyle: CommonStyleType = {
       width: "100%",
       height: "100%",
-
     }
     if (oml2d) {
       // @ts-ignore
@@ -130,7 +136,6 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
     const handleResize = () => {
       oml2d?.setModelPosition({ x: getPositionX() })
       oml2d?.setModelScale(getScale());
-      console.log(getPositionX(), getScale());
     };
 
     window.addEventListener('resize', handleResize);
