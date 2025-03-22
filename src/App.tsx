@@ -1,8 +1,12 @@
+import { Outlet } from "react-router";
 import "./App.css";
+import NavBar from "./components/NavBar";
 
 function App() {
   return (
-    <div className="min-w-96 h-100 bg-amber-50">
+    <div className="flex flex-col gap-3 justify-start w-full h-full">
+      <NavBar></NavBar>
+      <Outlet></Outlet>
     </div>
   );
 }
