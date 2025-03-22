@@ -13,7 +13,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@iconify-icon/react": "^2.3.0",
     "@tailwindcss/vite": "^4.0.14",
+    "antd": "^5.24.4",
     "oh-my-live2d": "^0.19.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
