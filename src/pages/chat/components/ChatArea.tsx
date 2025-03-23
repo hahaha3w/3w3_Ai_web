@@ -115,7 +115,7 @@ const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
         content: "你才是猫娘，你全家都是猫娘！",
         timestamp: new Date(),
       });
-      oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 300, 1);
+      oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 3000, 1);
     }, 3000);
   };
 
