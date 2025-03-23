@@ -16,7 +16,7 @@ app.get("/api/sse", (req, res) => {
   sendEvent({ message: "Connected to SSE", timestamp: new Date().toISOString() });
 
   let count = 0;
-  const maxEvents = 5;
+  const maxEvents = 50;
 
   // Send periodic updates
   const interval = setInterval(() => {
@@ -27,7 +27,7 @@ app.get("/api/sse", (req, res) => {
       clearInterval(interval);
       res.end(); // End the connection after 5 events
     }
-  }, 1000);
+  }, 100);
 
   // Cleanup when the connection is closed
   req.on("close", () => {

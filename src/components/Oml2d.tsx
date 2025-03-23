@@ -65,6 +65,7 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // 添加阴影效果
       fontSize: "18px", // 设置字体大小
       textAlign: "center", // 文字居中对齐
+      zIndex: "100000", // 设置 z-index 为 1000
     };
     const stageStyle: CommonStyleType = {
       width: "100%",

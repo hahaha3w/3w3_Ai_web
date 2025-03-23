@@ -61,7 +61,7 @@ const Header = ({ title, oml2d }: HeaderProps) => {
     },
   ];
   return (
-    <div className="w-full h-[120px] absolute top-0 bg-gradient-to-b from-[rgba(0,0,0,0.2)] to-transparent z-10001 opacity-80">
+    <div className="w-full absolute top-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] to-transparent z-10001 opacity-80">
       <div className="flex justify-between items-center h-[60px] px-4">
         <h2 className="text-2xl font-bold mt-0">{title}</h2>
         <div className="relative inline-block text-left">
