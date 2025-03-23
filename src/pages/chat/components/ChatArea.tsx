@@ -15,6 +15,7 @@ import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import React, { useRef, useState } from "react";
 import styles from "./ChatArea.module.scss";
 import useChatStore from "@/store/chat";
+import Api from "@/service/api";
 
 type HeaderProps = {
   title: string;
@@ -22,6 +23,8 @@ type HeaderProps = {
 };
 
 const Header = ({ title, oml2d }: HeaderProps) => {
+  const { addMessage, setMessage } = useChatStore();
+
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -34,9 +37,26 @@ const Header = ({ title, oml2d }: HeaderProps) => {
     },
     {
       key: "2",
-      label: "你好，猫娘",
+      label: "SSE",
       onClick: () => {
-        oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 30000, 100);
+        const key = Date.now();
+        let content = "SSE: 连接中...";
+        addMessage({
+          key: key,
+          role: "ai",
+          content: content,
+          timestamp: new Date(),
+        });
+        Api.Test.subscribeToUpdates(
+          (message: { count: number; message: string }) => {
+            if (message.message) {
+              content = content + " | " + message.message;
+            } else {
+              content = content + " | " + "第 " + message.count + " 条消息";
+            }
+            setMessage(key, content);
+          }
+        );
       },
     },
   ];
@@ -98,7 +118,7 @@ const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const { messages, addMessage } = useChatStore();
-  const [lastAiMessage, setLastAiMessage] = useState<string | null>(null);
+  // const [lastAiMessage, setLastAiMessage] = useState<string | null>(null);
 
   const handleSend = (message: string) => {
     addMessage({

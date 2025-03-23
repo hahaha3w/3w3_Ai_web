@@ -2,7 +2,7 @@ import { http } from "../utils/axios";
 
 class Test {
   private static urls = {
-    subscribe: "/test/subscribe",
+    subscribe: "/sse",
   };
 
   static subscribeToUpdates<T>(
