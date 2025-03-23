@@ -14,6 +14,8 @@ body {
   
 }
 
+
+
 #root {
   width: 100%;
   height: 100%;
@@ -27,6 +29,14 @@ body {
 .ant-dropdown {
 
   z-index: 100000!important;
+}
+
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
+
+body::-webkit-scrollbar {
+  display: block
 }
 
 /* custom utility*/
@@ -43,3 +53,5 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+

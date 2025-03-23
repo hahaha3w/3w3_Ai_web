@@ -3,6 +3,7 @@ import { mockData } from "./ActivityType"
 import ActivityCard from "./ActivityCard"
 
 
+
 const Activity: FC = () => {
   //TODO 最近活动确认一下
   /**
