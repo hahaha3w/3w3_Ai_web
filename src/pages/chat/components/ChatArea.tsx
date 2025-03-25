@@ -10,28 +10,29 @@ import {
   MenuProps,
   theme,
   Tooltip,
+  Button,
 } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, memo, useCallback } from "react";
 import styles from "./ChatArea.module.scss";
 import useChatStore from "@/store/chat";
 import Api from "@/service/api";
 
-type HeaderProps = {
+// 使用 memo 包装 Header 组件避免不必要的重渲染
+const Header = memo(({ title, oml2d, onToggleSidebar }: {
   title: string;
   oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
-};
-
-const Header = ({ title, oml2d }: HeaderProps) => {
+  onToggleSidebar?: () => void;
+}) => {
   const { addMessage, setMessage } = useChatStore();
 
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: "切换模型",
+      label: "切换衣服",
       onClick: () => {
         if (oml2d) {
-          oml2d.loadNextModel();
+          oml2d.loadNextModelClothes();
         }
       },
     },
@@ -60,13 +61,24 @@ const Header = ({ title, oml2d }: HeaderProps) => {
       },
     },
   ];
+
   return (
     <div className="w-full absolute top-0 bg-gradient-to-b from-[rgba(0,0,0,0.5)] to-transparent z-10001 opacity-80">
       <div className="flex justify-between items-center h-[60px] px-4">
-        <h2 className="text-2xl font-bold mt-0">{title}</h2>
+        <div className="flex items-center">
+          {onToggleSidebar && (
+            <Button 
+              type="text" 
+              icon={<Icon icon="heroicons:bars-3" className="text-xl text-white" />} 
+              onClick={onToggleSidebar}
+              className="mr-2 border-0 shadow-none"
+            />
+          )}
+          <h2 className="text-2xl font-bold mt-0">{title}</h2>
+        </div>
         <div className="relative inline-block text-left">
           <Dropdown
-            trigger={["click"]}
+            // trigger={["click"]}
             overlayClassName="chat-area-settings"
             menu={{ items }}
             placement="bottomRight"
@@ -74,13 +86,15 @@ const Header = ({ title, oml2d }: HeaderProps) => {
               return <div className={styles.menu}>{menus}</div>;
             }}
           >
-            <Icon icon="uil:setting" className="text-3xl" />
+            <div className="cursor-pointer">
+              <Icon icon="uil:setting" className="text-3xl" />
+            </div>
           </Dropdown>
         </div>
       </div>
     </div>
   );
-};
+});
 
 const rolesAsObject: GetProp<typeof Bubble.List, "roles"> = {
   ai: {
@@ -109,18 +123,16 @@ const rolesAsObject: GetProp<typeof Bubble.List, "roles"> = {
   },
 };
 
-type MessageListProps = {
+// 使用 memo 来优化 MessageList 组件
+const MessageList = memo(({ oml2d }: {
   oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
-};
-
-const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
+}) => {
   const listRef = useRef<GetRef<typeof Bubble.List>>(null);
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const { messages, addMessage } = useChatStore();
-  // const [lastAiMessage, setLastAiMessage] = useState<string | null>(null);
 
-  const handleSend = (message: string) => {
+  const handleSend = useCallback((message: string) => {
     addMessage({
       key: Date.now(),
       role: "user",
@@ -137,10 +149,10 @@ const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
       });
       oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 3000, 1);
     }, 3000);
-  };
+  }, [addMessage, oml2d]);
 
   return (
-    <div className="w-full h-full box-border flex justify-end flex-col top-0 absolute p-4  z-10000">
+    <div className="w-full h-full box-border flex justify-end flex-col top-0 absolute p-4 z-10000">
       <Bubble.List
         className={styles.bubbleListContainer}
         ref={listRef}
@@ -153,6 +165,7 @@ const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
         onChange={setValue}
         loading={loading}
         onSubmit={(value) => {
+          if (!value.trim()) return;
           setValue("");
           setLoading(true);
           handleSend(value);
@@ -185,22 +198,22 @@ const MessageList: React.FC<MessageListProps> = ({ oml2d }) => {
       />
     </div>
   );
-};
+});
 
 type ChatAreaProps = {
   title: string;
+  onToggleSidebar?: () => void;
+  oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
+  setOml2d: React.Dispatch<
+    React.SetStateAction<(Oml2dProperties & Oml2dMethods & Oml2dEvents) | null>
+  >;
 };
 
-const ChatArea = ({ title }: ChatAreaProps) => {
-  const [oml2d, setOml2d] = useState<
-    (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null
-  >(null);
-
+const ChatArea = ({ title, onToggleSidebar, oml2d, setOml2d }: ChatAreaProps) => {
   return (
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div className="relative text-gray-50">
-        {/* 修正：正确传递 className 属性 */}
-        <Header title={title} oml2d={oml2d} />
+      <div className={`relative text-gray-50 w-full h-full overflow-hidden rounded-lg shadow-xl ${styles.chatContainer}`}>
+        <Header title={title} oml2d={oml2d} onToggleSidebar={onToggleSidebar} />
         <Oml2d oml2d={oml2d} setOml2d={setOml2d} />
         <MessageList oml2d={oml2d} />
       </div>

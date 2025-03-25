@@ -1,0 +1,38 @@
+export const MODELS = [
+  {
+    id: 'whiteCat',
+    name: '白猫',
+    icon: 'emojione:cat-face',
+    path: '/models/cat-white/model.json',
+    scaleAdjust: 1,
+    xAdjust: 1.2,
+    yAdjust: 1,
+  },
+  {
+    id: 'blackCat',
+    name: '黑猫',
+    icon: 'twemoji:black-cat',
+    path: '/models/cat-black/model.json',
+    scaleAdjust: 1,
+    xAdjust: 1.2,
+    yAdjust: 1,
+  },
+  {
+    id: '22',
+    name: '22娘',
+    icon: 'fluent-emoji:woman-mage',
+    path: '/models/bilibili-22/index.json',
+    scaleAdjust: 1.5,
+    xAdjust: 1.4,
+    yAdjust: 1.3,
+  },
+  {
+    id: '33',
+    name: '33娘',
+    icon: 'fluent-emoji:princess',
+    path: '/models/bilibili-33/index.json',
+    scaleAdjust: 1.5,
+    xAdjust: 1.4,
+    yAdjust: 1.3,
+  },
+];

@@ -11,6 +11,7 @@ import {
 import { memo, useEffect, useRef } from "react";
 import styles from "./Oml2d.module.scss";
 import useChatStore from "@/store/chat";
+import { MODELS } from "@/models/modelDefinitions";
 
 type Oml2dProps = {
   oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
@@ -23,24 +24,34 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   const oml2dRef = useRef<HTMLDivElement>(null);
   const { messages, addMessage } = useChatStore();
 
-  const getPositionX = () => {
+  const getPositionX = (xAdjust = 1) => {
     if (window.innerWidth < 768) {
-      return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.05 : 120;
+      return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.05 * xAdjust : 120;
     }
-    return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.2 : 120;
+    return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.2 * xAdjust : 120;
   };
 
-  const getScale = () => {
+  const getPositionY = (yAdjust = 1) => {
+    const containerHeight = oml2dRef.current ? oml2dRef.current.offsetHeight : 600;
     if (window.innerWidth < 768) {
-      const scale = oml2dRef.current
+      return containerHeight * 0.05 * yAdjust;
+    }
+    return containerHeight * 0.1 * yAdjust;
+  };
+
+  const getScale = (adjustRatio = 1) => {
+    if (window.innerWidth < 768) {
+      const baseScale = oml2dRef.current
         ? oml2dRef.current.offsetWidth * 0.0005
         : 0.2;
-      return scale > 0.25 ? 0.25 : scale;
+      const scale = baseScale > 0.25 ? 0.25 : baseScale;
+      return scale * adjustRatio;
     }
-    const scale = oml2dRef.current
+    const baseScale = oml2dRef.current
       ? oml2dRef.current.offsetHeight * 0.0005
       : 0.2;
-    return scale > 0.3 ? 0.3 : scale;
+    const scale = baseScale > 0.3 ? 0.3 : baseScale;
+    return scale * adjustRatio;
   };
 
   useEffect(() => {
@@ -57,15 +68,15 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   useEffect(() => {
     const tipsStyle: CommonStyleType = {
       borderRadius: "50px",
-      backgroundColor: "rgba(255,255,255, 0.1)", // 设置背景颜色为黑色，透明度为 0.5
-      backdropFilter: "blur(10px)", // 添加模糊效果
-      color: "#ffffff", // 添加文字颜色为白色
-      border: "none", // 移除边框
-      padding: "10px 20px", // 添加内边距
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // 添加阴影效果
-      fontSize: "18px", // 设置字体大小
-      textAlign: "center", // 文字居中对齐
-      zIndex: "100000", // 设置 z-index 为 1000
+      backgroundColor: "rgba(255,255,255, 0.1)",
+      backdropFilter: "blur(10px)",
+      color: "#ffffff",
+      border: "none",
+      padding: "10px 20px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      fontSize: "18px",
+      textAlign: "center",
+      zIndex: "100000",
     };
     const stageStyle: CommonStyleType = {
       width: "100%",
@@ -111,23 +122,13 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
         },
       },
       transitionTime: 1000,
-      models: [
-        {
-          path: "/models/cat-white/model.json",
-
-          position: [getPositionX(), 0],
-          name: "whiteCat",
-          scale: getScale(),
-          mobileScale: getScale(),
-        },
-        {
-          path: "/models/cat-black/model.json",
-          name: "blackCat",
-          position: [getPositionX(), 0],
-          scale: getScale(),
-          mobileScale: getScale(),
-        },
-      ],
+      models: MODELS.map(model => ({
+        path: model.path,
+        name: model.id,
+        position: [getPositionX(model.xAdjust), getPositionY(model.yAdjust)],
+        scale: getScale(model.scaleAdjust),
+        mobileScale: getScale(model.scaleAdjust),
+      })),
     });
 
     newOml2d.onLoad((state) => {
@@ -148,32 +149,51 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
 
     setOml2d(newOml2d);
 
-    newOml2d.loadModelByName("whiteCat");
+    // 使用索引加载默认模型
+    newOml2d.loadModelByIndex(0);
   }, [oml2d]);
 
   useEffect(() => {
-    // oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 30000, 100);
     oml2d?.onStageSlideIn(() => {
-      oml2d?.setModelPosition({ x: getPositionX() });
-      oml2d?.setModelScale(getScale());
+      const currentModelIndex = oml2d.modelIndex;
+      const model = MODELS[currentModelIndex];
+
+      oml2d?.setModelPosition({
+        x: getPositionX(model?.xAdjust || 1),
+        y: getPositionY(model?.yAdjust || 1),
+      });
+      oml2d?.setModelScale(getScale(model?.scaleAdjust || 1));
     });
+
     oml2d?.onStageSlideOut(() => {
-      oml2d?.setModelPosition({ x: getPositionX() });
-      oml2d?.setModelScale(getScale());
+      const currentModelIndex = oml2d.modelIndex;
+      const model = MODELS[currentModelIndex];
+
+      oml2d?.setModelPosition({
+        x: getPositionX(model?.xAdjust || 1),
+        y: getPositionY(model?.yAdjust || 1),
+      });
+      oml2d?.setModelScale(getScale(model?.scaleAdjust || 1));
     });
   }, [oml2d]);
 
   useEffect(() => {
     const handleResize = () => {
-      // 直接更新模型位置和缩放
-      oml2d?.setModelPosition({ x: getPositionX() });
-      oml2d?.setModelScale(getScale());
+      const currentModelIndex = oml2d?.modelIndex || 0;
+      const model = MODELS[currentModelIndex];
+
+      oml2d?.setModelPosition({
+        x: getPositionX(model?.xAdjust || 1),
+        y: getPositionY(model?.yAdjust || 1),
+      });
+      oml2d?.setModelScale(getScale(model?.scaleAdjust || 1));
     };
+
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [oml2d]); // 添加依赖项
+  }, [oml2d]);
 
   return (
     <div
