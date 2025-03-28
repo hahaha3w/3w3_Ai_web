@@ -13,7 +13,7 @@ export default abstract class BaseApi {
     }]
 
     this.http.defaults.transformResponse = [(data: Record<string, string>) => {
-      const camelData: Record<string, string> = snakeToCamel(data)
+      const camelData: Record<string, string> = snakeToCamel(JSON.parse(data as unknown as string))
       return camelData
     }]
   }

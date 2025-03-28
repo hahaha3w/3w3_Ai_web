@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: import.meta.env.VITE_SERVICE_BASE_URL, // 使用 Vite 提供的环境变量设置 API 基础 URL
+  baseURL: import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_SERVICE_BASE_URL
+    : "/api", // 开发环境使用 /api，生产环境使用环境变量配置的 API 基础 URL
   timeout: parseInt(import.meta.env.VITE_SERVICE_TIMEOUT || "5000"), // 使用 Vite 提供的环境变量设置请求超时时间
   headers: {
     "Content-Type": "application/json",
@@ -28,6 +30,16 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => {
     // 处理成功的响应
+    if (typeof response.data === "string") {
+      try {
+        const data = JSON.parse(response.data);
+        console.log("API 响应数据:", data);
+        return data;
+      } catch (error) {
+        console.warn("API 响应数据无法解析为 JSON:", error);
+        return response.data;
+      }
+    }
     return response.data;
   },
   (error) => {
