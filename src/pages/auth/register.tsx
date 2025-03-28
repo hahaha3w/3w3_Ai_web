@@ -174,7 +174,7 @@ const RegisterPage: React.FC = () => {
           </Form.Item>
 
           <div className={styles.registerLink}>
-            已有账号? <a href="/auth/login">立即登录</a>
+            已有账号? <a onClick={()=> navigate("/auth/login")}>立即登录</a>
           </div>
         </Form>
       </div>

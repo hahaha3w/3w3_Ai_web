@@ -175,7 +175,7 @@ const ChangePasswordPage: React.FC = () => {
           </Form.Item>
 
           <div className={styles.registerLink}>
-            <a href="/auth/login">返回登录</a>
+            <a onClick={()=> navigate("/auth/register")}>返回登录</a>
           </div>
         </Form>
       </div>
