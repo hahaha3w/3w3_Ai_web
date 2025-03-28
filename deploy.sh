@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 添加 pnpm 的路径到 PATH
-export PATH=/root/.nvm/versions/node/v22.14.0/bin/pnpm:$PATH
+export PATH=/root/.nvm/versions/node/v22.14.0/bin:$PATH
 
 # 确定脚本所在目录（仓库根目录）
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -23,13 +23,13 @@ cd $PROJECT_DIR || { log "项目目录不存在！"; exit 1; }
 # 安装依赖
 log "安装依赖..."
 if [ -f "package.json" ]; then
-  pnpm install || { log "依赖安装失败！"; exit 1; }
+  yes | pnpm install || { log "依赖安装失败！"; exit 1; }
 fi
 
 # 构建项目
 log "构建项目..."
 if [ -f "package.json" ]; then
-  pnpm run build || { log "项目构建失败！"; exit 1; }
+  yes | pnpm run build || { log "项目构建失败！"; exit 1; }
 fi
 
 # 检查构建输出目录是否存在
@@ -40,6 +40,6 @@ fi
 
 # 复制构建文件到目标目录
 log "复制构建文件到目标目录..."
-rsync -avz --delete "$BUILD_DIR/" "$TARGET_DIR/" || { log "文件复制失败！"; exit 1; }
+yes | rsync -avz --delete "$BUILD_DIR/" "$TARGET_DIR/" || { log "文件复制失败！"; exit 1; }
 
 log "部署完成！"
