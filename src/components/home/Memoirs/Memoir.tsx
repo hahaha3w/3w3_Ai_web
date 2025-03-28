@@ -1,6 +1,6 @@
 import { FC } from "react"
-import { MemoirData, memoirsMockData } from "./MemoirType"
 import MemoirCard from "./MemoirCard"
+import { memoirsMockData } from "./MemoirType"
 
 const Memoir: FC = () => {
   return (

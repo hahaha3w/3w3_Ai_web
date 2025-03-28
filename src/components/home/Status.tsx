@@ -1,6 +1,5 @@
-import React from 'react'
-import StatusCard from '../common/StatusCard'
 import chat from "@/assets/chat.svg"
+import StatusCard from '../common/StatusCard'
 const AIStatus = () => {
   return (
     <div className='w-full row-center flex-row gap-4'>
