@@ -1,7 +1,7 @@
-import HomeBaseApi from "./BaseApi";
+import BaseApi from "../shared";
 import { MemoirDeleteRes, MemoirResData, MemoirResListData } from "./data";
 
-export class memoirApi extends HomeBaseApi {
+export class memoirApi extends BaseApi {
   urls = {
     memoir: "/memoirs"
   }

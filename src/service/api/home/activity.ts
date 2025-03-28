@@ -1,8 +1,8 @@
-import HomeBaseApi from "./BaseApi";
+import BaseApi from "../shared";
 import { ActivityResData, PostActivityData } from "./data";
 
 
-class ActivityApi extends HomeBaseApi {
+class ActivityApi extends BaseApi {
   urls = {
     activitys: "/api/activities",
   }
