@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 添加 pnpm 的路径到 PATH
+export PATH=/root/.nvm/versions/node/v22.14.0/bin/pnpm:$PATH
+
 # 确定脚本所在目录（仓库根目录）
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_DIR="$SCRIPT_DIR"
