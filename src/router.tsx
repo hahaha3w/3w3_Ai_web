@@ -1,13 +1,13 @@
-import { createBrowserRouter } from "react-router";
-import HomePage from "./pages/home";
-import ChatPage from "./pages/chat";
+import { createHashRouter } from "react-router";
 import App from "./App";
-import UserPage from "./pages/user";
+import ChangePasswordPage from "./pages/auth/changePassword"; // 新增的导入
 import LoginPage from "./pages/auth/login";
 import RegisterPage from "./pages/auth/register"; // 新增的导入
-import ChangePasswordPage from "./pages/auth/changePassword"; // 新增的导入
+import ChatPage from "./pages/chat";
+import HomePage from "./pages/home";
+import UserPage from "./pages/user";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <App />,
