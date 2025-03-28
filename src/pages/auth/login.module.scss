@@ -1,0 +1,45 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.loginForm {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loginButton {
+  height: 40px;
+  font-size: 16px;
+}
+
+.registerLink {
+  text-align: center;
+  margin-top: 16px;
+  color: #666;
+}
+
+.registerLink a {
+  color: #1890ff;
+  margin-left: 4px;
+}
