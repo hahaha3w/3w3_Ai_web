@@ -42,7 +42,7 @@
 .modelSelector {
   padding: 0 16px;
   margin-bottom: 20px;
-  max-height: 200px; // 限制最大高度
+  max-height: 180px; // 限制最大高度
   overflow-y: auto; // 添加垂直滚动条
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -174,5 +174,80 @@ button {
 
   &:hover {
     background-color: rgba(24, 144, 255, 0.1);
+  }
+}
+
+.moodItem {
+  text-align: center;
+  cursor: pointer;
+  margin: 0 2px;
+  transition: all 0.2s ease;
+  padding: 6px 2px; // 减小内边距
+  border-radius: 8px;
+  box-sizing: border-box;
+  width: 52px; // 设置固定宽度
+  
+  &:hover {
+    background-color: rgba(24, 144, 255, 0.05);
+    transform: scale(1.05);
+  }
+  
+  &.active {
+    background-color: rgba(24, 144, 255, 0.15);
+    border: 1px solid rgba(24, 144, 255, 0.3);
+    
+    .moodText {
+      color: #1890ff;
+      font-weight: 500;
+    }
+  }
+  
+  .moodEmoji {
+    font-size: 1.75rem; // 稍微缩小字体大小
+    display: block;
+    margin-bottom: 2px; // 减小底部间距
+    transition: transform 0.2s ease;
+  }
+  
+  .moodText {
+    font-size: 0.75rem; // 缩小文字大小
+    color: #666;
+    white-space: nowrap; // 防止文字换行
+  }
+}
+
+/* 定制 Ant Design Collapse 样式 */
+:global {
+  .ant-collapse {
+    background-color: transparent !important;
+    border: none !important;
+    
+    .ant-collapse-item {
+      border-bottom: none !important;
+      
+      .ant-collapse-header {
+        padding: 8px 16px !important;
+        align-items: center !important;
+        
+        .ant-collapse-header-text {
+          font-size: 1rem;
+          font-weight: 500;
+          color: rgba(0, 0, 0, 0.85);
+        }
+        
+        .ant-collapse-expand-icon {
+          padding-inline-end: 8px !important;
+        }
+      }
+      
+      .ant-collapse-content {
+        background-color: transparent !important;
+        border-top: none !important;
+        
+        .ant-collapse-content-box {
+          padding: 0 !important;
+        }
+      }
+    }
   }
 }

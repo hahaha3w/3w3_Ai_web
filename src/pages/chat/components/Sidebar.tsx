@@ -1,8 +1,10 @@
 import { MODELS } from "@/models/modelDefinitions";
-import useChatStore from "@/store/chat"; // 引入 chat store
+import useChatStore from "@/store/chat";
+import useMood from "@/hooks/useMood"; // 导入心情钩子
+import { MoodType } from "@/store/mood"; // 导入心情类型
 import { Conversation } from "@/service/api/chat/types";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
-import { Button, Divider, Tooltip } from "antd";
+import { Button, Collapse, Tooltip } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import React, { memo, useEffect, useState } from "react";
 import styles from "./Sidebar.module.scss";
@@ -19,8 +21,11 @@ const Sidebar: React.FC<SidebarProps> = memo(
   ({ visible, id, onClose, oml2d }) => {
     const { chatList, setCurrentChat, currentChatId, setChatList } =
       useChatStore(); // 从 store 获取对话列表和方法
+    const { mood, setMood } = useMood(); // 使用心情钩子
     const [currentModelIndex, setCurrentModelIndex] = useState<number>(0);
     const [isSwitching, setIsSwitching] = useState<boolean>(false); // 控制切换状态
+    // 默认展开的面板，使用数组格式，与Ant Design Collapse一致
+    const [activeKeys, setActiveKeys] = useState<string[]>(['models', 'chats']);
 
     useEffect(() => {
       const chatId = Number(id); // 尝试将 id 转换为数字
@@ -88,10 +93,24 @@ const Sidebar: React.FC<SidebarProps> = memo(
       setCurrentChat(newConversationId); // 切换到新对话
     };
 
-    // 设置今日心情
-    const handleSetMood = (mood: string) => {
-      console.log("今日心情设置为：", mood);
-      alert(`今日心情已设置为：${mood}`);
+    // 处理心情设置
+    const handleSetMood = (moodType: MoodType) => {
+      setMood(moodType);
+      console.log("设置心情为：", moodType);
+    };
+
+    // 心情映射表
+    const moodMap: Record<MoodType, { emoji: string, text: string }> = {
+      happy: { emoji: "😊", text: "开心" },
+      sad: { emoji: "😢", text: "难过" },
+      angry: { emoji: "😡", text: "生气" },
+      tired: { emoji: "😴", text: "疲惫" },
+      neutral: { emoji: "😐", text: "平静" }
+    };
+
+    // 处理折叠面板变化
+    const handleCollapseChange = (keys: string | string[]) => {
+      setActiveKeys(typeof keys === 'string' ? [keys] : keys);
     };
 
     return (
@@ -124,101 +143,100 @@ const Sidebar: React.FC<SidebarProps> = memo(
           </div>
         </div>
 
-        <Divider className="my-4">模型选择</Divider>
-
-        <div className={styles.modelSelector}>
-          {MODELS.map((model, index) => (
-            <div
-              key={model.id}
-              className={`${styles.modelItem} ${
-                currentModelIndex === index ? styles.active : ""
-              } ${isSwitching ? styles.disabled : ""}`} // 添加禁用样式
-              onClick={() => handleModelChange(index)}
-            >
-              <Icon
-                icon={model.icon}
-                className={`text-2xl ${
-                  currentModelIndex === index
-                    ? "text-blue-500"
-                    : "text-gray-600"
-                }`}
-              />
-              <span
-                className={`ml-2 ${
-                  currentModelIndex === index
-                    ? "text-blue-500 font-medium"
-                    : "text-gray-700"
-                }`}
-              >
-                {model.name}
-              </span>
-              {currentModelIndex === index && (
-                <Icon
-                  icon="material-symbols:check-circle"
-                  className="text-blue-500 ml-auto"
-                />
-              )}
+        {/* 使用 Ant Design 的 Collapse 组件 */}
+        <Collapse 
+          activeKey={activeKeys} 
+          onChange={handleCollapseChange}
+          bordered={false}
+          expandIconPosition="end"
+          className="mt-4"
+        >
+          {/* 模型选择面板 */}
+          <Collapse.Panel key="models" header="模型选择">
+            <div className={styles.modelSelector}>
+              {MODELS.map((model, index) => (
+                <div
+                  key={model.id}
+                  className={`${styles.modelItem} ${
+                    currentModelIndex === index ? styles.active : ""
+                  } ${isSwitching ? styles.disabled : ""}`}
+                  onClick={() => handleModelChange(index)}
+                >
+                  <Icon
+                    icon={model.icon}
+                    className={`text-2xl ${
+                      currentModelIndex === index
+                        ? "text-blue-500"
+                        : "text-gray-600"
+                    }`}
+                  />
+                  <span
+                    className={`ml-2 ${
+                      currentModelIndex === index
+                        ? "text-blue-500 font-medium"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {model.name}
+                  </span>
+                  {currentModelIndex === index && (
+                    <Icon
+                      icon="material-symbols:check-circle"
+                      className="text-blue-500 ml-auto"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <Divider className="my-4">对话列表</Divider>
-
-        <div className={styles.chatList}>
-          {chatList.map((chat: Conversation) => (
-            <div
-              key={chat.conversationId}
-              className={`${styles.chatItem} ${
-                currentChatId === chat.conversationId ? styles.active : ""
-              }`}
-              onClick={() => setCurrentChat(chat.conversationId)}
-            >
-              <span className="text-gray-800">{chat.sessionTitle}</span>
-              <span className="text-gray-500 text-xs truncate">
-                {chat.lastMessage}
-              </span>
+          </Collapse.Panel>
+          
+          {/* 对话列表面板 */}
+          <Collapse.Panel key="chats" header="对话列表">
+            <div className={styles.chatList}>
+              {chatList.map((chat: Conversation) => (
+                <div
+                  key={chat.conversationId}
+                  className={`${styles.chatItem} ${
+                    currentChatId === chat.conversationId ? styles.active : ""
+                  }`}
+                  onClick={() => setCurrentChat(chat.conversationId)}
+                >
+                  <span className="text-gray-800">{chat.sessionTitle}</span>
+                  <span className="text-gray-500 text-xs truncate">
+                    {chat.lastMessage}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </Collapse.Panel>
+        </Collapse>
 
         <div className="absolute bottom-4 left-0 right-0 px-4">
-          <Divider className="my-4">今日心情</Divider>
-
-          <div className="flex justify-around mb-4">
-            <div
-              className="text-center cursor-pointer"
-              onClick={() => handleSetMood("😊")}
-            >
-              <span className="text-2xl">😊</span>
-              <div className="text-sm text-gray-600">开心</div>
+          <div className="mb-4">
+            <div className="px-2 py-2">
+              <h3 className="text-base font-medium">今日心情</h3>
             </div>
-            <div
-              className="text-center cursor-pointer"
-              onClick={() => handleSetMood("😢")}
-            >
-              <span className="text-2xl">😢</span>
-              <div className="text-sm text-gray-600">难过</div>
-            </div>
-            <div
-              className="text-center cursor-pointer"
-              onClick={() => handleSetMood("😡")}
-            >
-              <span className="text-2xl">😡</span>
-              <div className="text-sm text-gray-600">生气</div>
-            </div>
-            <div
-              className="text-center cursor-pointer"
-              onClick={() => handleSetMood("😴")}
-            >
-              <span className="text-2xl">😴</span>
-              <div className="text-sm text-gray-600">疲惫</div>
+            
+            {/* 调整心情容器的布局 */}
+            <div className="flex justify-between px-2 mt-2"> {/* 改为justify-between并添加水平内边距 */}
+              {(["happy", "sad", "angry", "tired"] as MoodType[]).map((moodType) => (
+                <div
+                  key={moodType}
+                  className={`${styles.moodItem} ${mood === moodType ? styles.active : ""}`}
+                  onClick={() => handleSetMood(moodType)}
+                >
+                  <span className={styles.moodEmoji}>{moodMap[moodType].emoji}</span>
+                  <div className={styles.moodText}>{moodMap[moodType].text}</div>
+                </div>
+              ))}
             </div>
           </div>
+          
           <Button
             type="primary"
             block
             icon={<Icon icon="material-symbols:add" />}
-            onClick={handleNewChat} // 添加点击事件
+            onClick={handleNewChat}
           >
             新建对话
           </Button>
