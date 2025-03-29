@@ -26,3 +26,17 @@ export const createPersistedStore = <State extends object , Actions extends obje
     storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
   }
 ))
+
+
+export const createImmerStore = <State extends object , Actions extends object>(
+  key: string,
+  initValues: State, 
+  actions: (set: StoreApi<State & Actions>['setState']) => Actions
+) => create(
+  immer<State & Actions>(
+    set => ({
+      ...initValues,
+      ...actions(set)
+      })
+  )
+)
