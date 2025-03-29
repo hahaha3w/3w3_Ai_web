@@ -7,6 +7,7 @@ import { Icon } from "@iconify-icon/react/dist/iconify.js";
 import { Button, Collapse, Tooltip } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import React, { memo, useEffect, useState } from "react";
+import { useNavigate } from "react-router"; // 导入useNavigate钩子
 import styles from "./Sidebar.module.scss";
 
 interface SidebarProps {
@@ -25,7 +26,8 @@ const Sidebar: React.FC<SidebarProps> = memo(
     const [currentModelIndex, setCurrentModelIndex] = useState<number>(0);
     const [isSwitching, setIsSwitching] = useState<boolean>(false); // 控制切换状态
     // 默认展开的面板，使用数组格式，与Ant Design Collapse一致
-    const [activeKeys, setActiveKeys] = useState<string[]>(['models', 'chats']);
+    const [activeKeys, setActiveKeys] = useState<string[]>(["models", "chats"]);
+    const navigate = useNavigate(); // 获取导航函数
 
     useEffect(() => {
       const chatId = Number(id); // 尝试将 id 转换为数字
@@ -34,7 +36,8 @@ const Sidebar: React.FC<SidebarProps> = memo(
         if (chat) {
           setCurrentChat(chat.conversationId); // 设置当前对话
         } else {
-          console.error("未找到对应的对话：", id);
+          console.warn("未找到对应的对话，创建新对话：", id);
+          handleNewChat(); // 如果未找到对应对话，创建新对话
         }
       } else if (id === "new") {
         handleNewChat(); // 如果是新对话，调用新建对话函数
@@ -91,6 +94,13 @@ const Sidebar: React.FC<SidebarProps> = memo(
       };
       setChatList([...chatList, newChat]); // 更新对话列表
       setCurrentChat(newConversationId); // 切换到新对话
+      navigate(`/chat/${newConversationId}`); // 更新URL
+    };
+
+    // 处理切换对话
+    const handleSwitchChat = (conversationId: number) => {
+      setCurrentChat(conversationId); // 更新当前对话ID
+      navigate(`/chat/${conversationId}`); // 更新URL
     };
 
     // 处理心情设置
@@ -100,17 +110,17 @@ const Sidebar: React.FC<SidebarProps> = memo(
     };
 
     // 心情映射表
-    const moodMap: Record<MoodType, { emoji: string, text: string }> = {
+    const moodMap: Record<MoodType, { emoji: string; text: string }> = {
       happy: { emoji: "😊", text: "开心" },
       sad: { emoji: "😢", text: "难过" },
       angry: { emoji: "😡", text: "生气" },
       tired: { emoji: "😴", text: "疲惫" },
-      neutral: { emoji: "😐", text: "平静" }
+      neutral: { emoji: "😐", text: "平静" },
     };
 
     // 处理折叠面板变化
     const handleCollapseChange = (keys: string | string[]) => {
-      setActiveKeys(typeof keys === 'string' ? [keys] : keys);
+      setActiveKeys(typeof keys === "string" ? [keys] : keys);
     };
 
     return (
@@ -144,8 +154,8 @@ const Sidebar: React.FC<SidebarProps> = memo(
         </div>
 
         {/* 使用 Ant Design 的 Collapse 组件 */}
-        <Collapse 
-          activeKey={activeKeys} 
+        <Collapse
+          activeKey={activeKeys}
           onChange={handleCollapseChange}
           bordered={false}
           expandIconPosition="end"
@@ -189,24 +199,47 @@ const Sidebar: React.FC<SidebarProps> = memo(
               ))}
             </div>
           </Collapse.Panel>
-          
+
           {/* 对话列表面板 */}
           <Collapse.Panel key="chats" header="对话列表">
             <div className={styles.chatList}>
-              {chatList.map((chat: Conversation) => (
-                <div
-                  key={chat.conversationId}
-                  className={`${styles.chatItem} ${
-                    currentChatId === chat.conversationId ? styles.active : ""
-                  }`}
-                  onClick={() => setCurrentChat(chat.conversationId)}
-                >
-                  <span className="text-gray-800">{chat.sessionTitle}</span>
-                  <span className="text-gray-500 text-xs truncate">
-                    {chat.lastMessage}
-                  </span>
-                </div>
-              ))}
+              {chatList
+                .sort((a, b) => {
+                  // Put the current chat at the top
+                  if (a.conversationId === currentChatId) return -1;
+                  if (b.conversationId === currentChatId) return 1;
+                  // Otherwise maintain reverse chronological order
+                  return b.conversationId - a.conversationId;
+                })
+                .map((chat: Conversation) => (
+                  <div
+                    key={chat.conversationId}
+                    className={`${styles.chatItem} ${
+                      currentChatId === chat.conversationId ? styles.active : ""
+                    }`}
+                    onClick={() => handleSwitchChat(chat.conversationId)}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex flex-col">
+                        <span
+                          className={`font-medium ${
+                            currentChatId === chat.conversationId
+                              ? "text-blue-600"
+                              : "text-gray-800"
+                          }`}
+                        >
+                          {chat.sessionTitle}
+                        </span>
+                        <span className="text-gray-500 text-xs truncate">
+                          {chat.lastMessage}
+                        </span>
+                      </div>
+                    </div>
+                    {currentChatId === chat.conversationId && (
+                      <div className={styles.activeIndicator}></div>
+                    )}
+                  </div>
+                ))}
             </div>
           </Collapse.Panel>
         </Collapse>
@@ -216,22 +249,32 @@ const Sidebar: React.FC<SidebarProps> = memo(
             <div className="px-2 py-2">
               <h3 className="text-base font-medium">今日心情</h3>
             </div>
-            
+
             {/* 调整心情容器的布局 */}
-            <div className="flex justify-between px-2 mt-2"> {/* 改为justify-between并添加水平内边距 */}
-              {(["happy", "sad", "angry", "tired"] as MoodType[]).map((moodType) => (
-                <div
-                  key={moodType}
-                  className={`${styles.moodItem} ${mood === moodType ? styles.active : ""}`}
-                  onClick={() => handleSetMood(moodType)}
-                >
-                  <span className={styles.moodEmoji}>{moodMap[moodType].emoji}</span>
-                  <div className={styles.moodText}>{moodMap[moodType].text}</div>
-                </div>
-              ))}
+            <div className="flex justify-between px-2 mt-2">
+              {" "}
+              {/* 改为justify-between并添加水平内边距 */}
+              {(["happy", "sad", "angry", "tired"] as MoodType[]).map(
+                (moodType) => (
+                  <div
+                    key={moodType}
+                    className={`${styles.moodItem} ${
+                      mood === moodType ? styles.active : ""
+                    }`}
+                    onClick={() => handleSetMood(moodType)}
+                  >
+                    <span className={styles.moodEmoji}>
+                      {moodMap[moodType].emoji}
+                    </span>
+                    <div className={styles.moodText}>
+                      {moodMap[moodType].text}
+                    </div>
+                  </div>
+                )
+              )}
             </div>
           </div>
-          
+
           <Button
             type="primary"
             block

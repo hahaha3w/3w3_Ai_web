@@ -1,22 +1,23 @@
 import Oml2d from "@/components/Oml2d";
 import { Bubble, Sender } from "@ant-design/x";
 
+import Api from "@/service/api";
+import useChatStore from "@/store/chat";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
 import {
+  Button,
   ConfigProvider,
   Dropdown,
   GetProp,
   GetRef,
   MenuProps,
+  message,
   theme,
   Tooltip,
-  Button,
 } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
-import React, { useRef, useState, memo, useCallback } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import styles from "./ChatArea.module.scss";
-import useChatStore from "@/store/chat";
-import Api from "@/service/api";
 
 // 使用 memo 包装 Header 组件避免不必要的重渲染
 const Header = memo(
@@ -29,7 +30,7 @@ const Header = memo(
     oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
     onToggleSidebar?: () => void;
   }) => {
-    const { addMessage, setMessage } = useChatStore();
+    const { addMessage } = useChatStore();
 
     const items: MenuProps["items"] = [
       {
@@ -39,32 +40,6 @@ const Header = memo(
           if (oml2d) {
             oml2d.loadNextModelClothes();
           }
-        },
-      },
-      {
-        key: "2",
-        label: "SSE",
-        onClick: () => {
-          const key = Date.now();
-          let content = "SSE: 连接中...";
-          addMessage({
-            content: content,
-            conversationId: 1, // Example conversationId
-            messageId: key, // Example messageId
-            sendTime: new Date().toISOString(),
-            senderType: "ai",
-            userId: 0, // Example userId for AI
-          });
-          Api.Test.subscribeToUpdates(
-            (message: { count: number; message: string }) => {
-              if (message.message) {
-                content = content + " | " + message.message;
-              } else {
-                content = content + " | " + "第 " + message.count + " 条消息";
-              }
-              setMessage(key, content);
-            }
-          );
         },
       },
     ];
@@ -146,32 +121,162 @@ const MessageList = memo(
     const listRef = useRef<GetRef<typeof Bubble.List>>(null);
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
-    const { messages, addMessage } = useChatStore();
+    const { messages, addMessage, currentChatId, setMessage } = useChatStore();
+    const closeEventSource = useRef<(() => void) | null>(null);
+    const aiResponseRef = useRef("");
+    const tempMessageIdRef = useRef<number | null>(null);
+    const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // 清理函数，确保组件卸载时关闭EventSource和计时器
+    useEffect(() => {
+      return () => {
+        if (closeEventSource.current) {
+          closeEventSource.current();
+        }
+        if (updateTimerRef.current) {
+          clearTimeout(updateTimerRef.current);
+        }
+      };
+    }, []);
+
+    // 作为单独的Effect处理消息更新，防止与渲染循环交叉
+    const updateMessageContent = useCallback(
+      (messageId: number, content: string) => {
+        setMessage(messageId, content);
+      },
+      [setMessage]
+    );
 
     const handleSend = useCallback(
-      (message: string) => {
+      async (content: string) => {
+        if (!currentChatId) {
+          message.error("请先选择或创建一个对话");
+          setLoading(false);
+          return;
+        }
+
+        // 添加用户消息
         addMessage({
-          content: message,
-          conversationId: 1, // Example conversationId
-          messageId: messages.length + 1, // Example messageId
+          content,
+          conversationId: currentChatId,
+          messageId: Date.now(), // 临时ID
           sendTime: new Date().toISOString(),
           senderType: "user",
-          userId: 0, // Example userId for AI
+          userId: 123, // 应该从用户状态获取
         });
-        setTimeout(() => {
+
+        // 重置流式响应相关变量
+        aiResponseRef.current = "";
+        const tempMessageId = Date.now() + 1; // 临时ID
+        tempMessageIdRef.current = tempMessageId;
+
+        if (updateTimerRef.current) {
+          clearTimeout(updateTimerRef.current);
+          updateTimerRef.current = null;
+        }
+
+        // 添加初始的AI回复消息（空内容）
+        addMessage({
+          content: "",
+          conversationId: currentChatId,
+          messageId: tempMessageId,
+          sendTime: new Date().toISOString(),
+          senderType: "ai",
+          userId: 0,
+        });
+
+        try {
+          // 调用API发送消息
+          const cleanup = await Api.chatApi.sendMsg(
+            {
+              content,
+              conversationId: currentChatId,
+            },
+            (data) => {
+              // 检查是否有消息和内容
+              if (data && data.message) {
+                // 如果message是空对象，视为接收完毕
+                if (
+                  Object.keys(data.message).length === 0 ||
+                  data.message.content === undefined
+                ) {
+                  if (tempMessageIdRef.current) {
+                    updateMessageContent(
+                      tempMessageIdRef.current,
+                      aiResponseRef.current
+                    );
+                    tempMessageIdRef.current = null;
+                  }
+
+                  setLoading(false);
+                  if (closeEventSource.current) {
+                    closeEventSource.current();
+                    closeEventSource.current = null;
+                  }
+                  return;
+                }
+
+                // 正常处理有内容的消息
+                aiResponseRef.current += data.message.content;
+                console.log("AI Response:", data.message.content);
+
+                // 直接更新UI，不使用防抖
+                if (tempMessageIdRef.current) {
+                  updateMessageContent(
+                    tempMessageIdRef.current,
+                    aiResponseRef.current
+                  );
+                }
+              }
+
+              // 处理流结束
+              if (data && data.end === true) {
+                if (tempMessageIdRef.current) {
+                  updateMessageContent(
+                    tempMessageIdRef.current,
+                    aiResponseRef.current
+                  );
+                  tempMessageIdRef.current = null;
+                }
+
+                // 仅在完整响应结束后让Live2D模型显示消息
+                if (oml2d && aiResponseRef.current) {
+                  // 提取前50个字符或更少作为气泡消息
+                  const previewText =
+                    aiResponseRef.current.length > 50
+                      ? aiResponseRef.current.substring(0, 50) + "..."
+                      : aiResponseRef.current;
+                  oml2d.tipsMessage(previewText, 3000, 1);
+                }
+
+                setLoading(false);
+                if (closeEventSource.current) {
+                  closeEventSource.current();
+                  closeEventSource.current = null;
+                }
+              }
+            },
+            (error) => {
+              console.error("消息发送错误:", error);
+              message.error("消息发送失败");
+              setLoading(false);
+
+              if (closeEventSource.current) {
+                closeEventSource.current();
+                closeEventSource.current = null;
+              }
+            }
+          );
+
+          closeEventSource.current =
+            typeof cleanup === "function" ? cleanup : null;
+        } catch (error) {
+          console.error("发送消息出错:", error);
+          message.error("消息发送失败");
           setLoading(false);
-          addMessage({
-            content: message,
-            conversationId: 1, // Example conversationId
-            messageId: messages.length + 1, // Example messageId
-            sendTime: new Date().toISOString(),
-            senderType: "ai",
-            userId: 0, // Example userId for AI
-          });
-          oml2d?.tipsMessage("你才是猫娘，你全家都是猫娘！", 3000, 1);
-        }, 3000);
+        }
       },
-      [addMessage, oml2d]
+      [addMessage, currentChatId, oml2d, updateMessageContent]
     );
 
     return (
@@ -196,6 +301,10 @@ const MessageList = memo(
           placeholder="聊点什么呢？"
           onCancel={() => {
             setLoading(false);
+            if (closeEventSource.current) {
+              closeEventSource.current();
+              closeEventSource.current = null;
+            }
           }}
           actions={(_, info) => {
             const { SendButton, LoadingButton } = info.components;

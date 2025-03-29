@@ -1,5 +1,6 @@
 import { useTokenStore } from "@/store/token";
 import axios from "axios";
+import { camelToSnake } from "./snakeCaseHelper";
 
 const http = axios.create({
   baseURL: import.meta.env.VITE_SERVICE_BASE_URL, // 开发环境使用 /api，生产环境使用环境变量配置的 API 基础 URL
@@ -18,6 +19,12 @@ http.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // 将 URL 参数转换为下划线形式
+    if (config.params) {
+      config.params = camelToSnake(config.params);
+    }
+
     return config;
   },
   (error) => {

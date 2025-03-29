@@ -35,7 +35,7 @@ interface ChatStore {
 }
 
 // 创建 Zustand store
-const useChatStore = create<ChatStore>((set) => ({
+const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   rawMessages: [],
   chatList: [
@@ -89,6 +89,12 @@ const useChatStore = create<ChatStore>((set) => ({
   }),
   setMessage: (messageId, content) =>
     set((state) => {
+      // 检查是否真的需要更新
+      const targetMessage = state.rawMessages.find(msg => msg.messageId === messageId);
+      if (targetMessage && targetMessage.content === content) {
+        return state; // 内容没变，不触发更新
+      }
+      
       const newRawMessages = state.rawMessages.map((msg) =>
         msg.messageId === messageId ? { ...msg, content } : msg
       );

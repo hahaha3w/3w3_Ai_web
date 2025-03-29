@@ -8,6 +8,8 @@ export interface SendMsgResData {
   message: {
     content?: string
   };
+  end?: boolean;
+  [property: string]: any;
 }
 
 export interface Message {

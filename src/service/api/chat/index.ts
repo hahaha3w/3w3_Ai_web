@@ -11,28 +11,55 @@ class Chat extends BaseApi {
 
   tag = "Chat";
 
-  sendMsg(data: SendMsgReq, onMsg: (data: any) => void, onError?: (error: unknown) => void) {
-    const queryParams = new URLSearchParams(data as Record<string, string>).toString();
-    const eventSource = new EventSource(`${this.http.defaults.baseURL}${this.urls.sendMsg}?${queryParams}`);
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        onMsg(data);
-      } catch (error) {
-        if (onError) {
-          onError(error);
+  async sendMsg(data: SendMsgReq, onMsg: (data: any) => void, onError?: (error: unknown) => void) {
+    let isCompleted = false;
+    try {
+      let lastProcessedLength = 0;
+
+      return await this.http.get(this.urls.sendMsg, {
+        params: data,
+        responseType: 'text',
+        onDownloadProgress: (progressEvent) => {
+          try {
+            const responseText = progressEvent.event?.target?.response || '';
+            if (responseText.length <= lastProcessedLength) return;
+
+            // Only process the new part of the response
+            const newContent = responseText.substring(lastProcessedLength);
+            lastProcessedLength = responseText.length;
+
+            const chunks = newContent.split('event:message\ndata:').filter(Boolean);
+
+            // Process only new chunks
+            for (let i = 0; i < chunks.length; i++) {
+              const chunk = chunks[i].trim();
+              try {
+                const jsonData = JSON.parse(chunk);
+                console.log("Received data:", jsonData);
+
+                // Check if this is the end of the stream (empty message object)
+                if (jsonData.message && Object.keys(jsonData.message).length === 0) {
+                  console.log("Stream completed");
+                  isCompleted = true;
+                  onMsg({ end: true });
+                  // You can add additional completion handling here if needed
+                } else {
+                  onMsg(jsonData);
+                }
+              } catch (error) {
+                console.warn("Failed to parse chunk:", chunk, error);
+              }
+            }
+          } catch (error) {
+            if (onError && !isCompleted) {
+              onError(error);
+            }
+          }
         }
-      }
-    };
-    eventSource.onerror = (error) => {
-      if (onError) {
-        onError(error);
-      }
-      eventSource.close();
-    };
-    return () => {
-      eventSource.close();
-    };
+      });
+    } catch (error) {
+      console.error("Error in sendMsg:", error);
+    }
   }
 
   getMsgHistory(data: GetMsgHistoryReq) {
