@@ -6,6 +6,7 @@ import RegisterPage from "./pages/auth/register"; // 新增的导入
 import ChatPage from "./pages/chat";
 import HomePage from "./pages/home";
 import UserPage from "./pages/user";
+import NotFoundPage from "./pages/404"; // 新增的导入
 
 const router = createHashRouter([
   {
@@ -41,6 +42,10 @@ const router = createHashRouter([
   {
     path: '/auth/changePassword', // 新增的路径
     element: <ChangePasswordPage />
+  },
+  {
+    path: '*',  // 添加通配符路由用于404页面
+    element: <NotFoundPage />
   }
 ]);
 
