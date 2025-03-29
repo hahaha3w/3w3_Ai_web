@@ -1,10 +1,11 @@
 import BaseApi from "../shared";
-import { CreatecConversationReq, CreatecConversationResData, DeleteConversationResData, GetConversationListReq, GetConversationListResData, SendMsgReq } from "./types";
+import { CreatecConversationReq, CreatecConversationResData, DeleteConversationResData, GetConversationListReq, GetConversationListResData, GetMsgHistoryReq, GetMsgHistoryResData, SendMsgReq } from "./types";
 
 
 class Chat extends BaseApi {
   urls = {
     sendMsg: "/chat/message",
+    msgHistory: "/chat/message/list",
     conversation: "/chat/conversation",
   };
 
@@ -32,6 +33,10 @@ class Chat extends BaseApi {
     return () => {
       eventSource.close();
     };
+  }
+
+  getMsgHistory(data: GetMsgHistoryReq) {
+    return this.http.get<GetMsgHistoryResData>(this.urls.msgHistory, { params: data });
   }
 
   createConversation(data: CreatecConversationReq) {

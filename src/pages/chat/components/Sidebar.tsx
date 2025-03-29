@@ -1,5 +1,6 @@
 import { MODELS } from "@/models/modelDefinitions";
 import useChatStore from "@/store/chat"; // 引入 chat store
+import { Conversation } from "@/service/api/chat/types";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
 import { Button, Divider, Tooltip } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
@@ -14,12 +15,8 @@ interface SidebarProps {
 
 // 使用 memo 优化 Sidebar 组件
 const Sidebar: React.FC<SidebarProps> = memo(({ visible, onClose, oml2d }) => {
-  const {
-    chatList,
-    setCurrentChat,
-    chatList: chats,
-    setChatList,
-  } = useChatStore(); // 从 store 获取对话列表和方法
+  const { chatList, setCurrentChat, currentChatId, setChatList } =
+    useChatStore(); // 从 store 获取对话列表和方法
   const [currentModelIndex, setCurrentModelIndex] = useState<number>(0);
   const [isSwitching, setIsSwitching] = useState<boolean>(false); // 控制切换状态
 
@@ -57,10 +54,18 @@ const Sidebar: React.FC<SidebarProps> = memo(({ visible, onClose, oml2d }) => {
 
   // 新建对话
   const handleNewChat = () => {
-    const newChatId = chats.length + 1;
-    const newChat = { id: newChatId, name: `对话 ${newChatId}` };
-    setChatList([...chats, newChat]); // 更新对话列表
-    setCurrentChat(newChatId); // 切换到新对话
+    const newConversationId =
+      Math.max(...chatList.map((chat) => chat.conversationId), 0) + 1;
+    const newChat: Conversation = {
+      conversationId: newConversationId,
+      createTime: new Date().toISOString(),
+      mode: "chat",
+      sessionTitle: `新对话 ${newConversationId}`,
+      userId: 123,
+      lastMessage: "",
+    };
+    setChatList([...chatList, newChat]); // 更新对话列表
+    setCurrentChat(newConversationId); // 切换到新对话
   };
 
   // 设置今日心情
@@ -136,13 +141,18 @@ const Sidebar: React.FC<SidebarProps> = memo(({ visible, onClose, oml2d }) => {
       <Divider className="my-4">对话列表</Divider>
 
       <div className={styles.chatList}>
-        {chatList.map((chat: any) => (
+        {chatList.map((chat: Conversation) => (
           <div
-            key={chat.id}
-            className={`${styles.chatItem}`}
-            onClick={() => setCurrentChat(chat.id)}
+            key={chat.conversationId}
+            className={`${styles.chatItem} ${
+              currentChatId === chat.conversationId ? styles.active : ""
+            }`}
+            onClick={() => setCurrentChat(chat.conversationId)}
           >
-            <span className="text-gray-800">{chat.name}</span>
+            <span className="text-gray-800">{chat.sessionTitle}</span>
+            <span className="text-gray-500 text-xs truncate">
+              {chat.lastMessage}
+            </span>
           </div>
         ))}
       </div>

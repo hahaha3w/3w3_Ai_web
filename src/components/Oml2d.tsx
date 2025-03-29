@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
+import { MODELS } from "@/models/modelDefinitions";
 import { CommonStyleType } from "node_modules/oh-my-live2d/dist/types/common";
 import {
   loadOml2d,
@@ -10,8 +11,6 @@ import {
 } from "oh-my-live2d";
 import { memo, useEffect, useRef } from "react";
 import styles from "./Oml2d.module.scss";
-import useChatStore from "@/store/chat";
-import { MODELS } from "@/models/modelDefinitions";
 
 type Oml2dProps = {
   oml2d: (Oml2dProperties & Oml2dMethods & Oml2dEvents) | null;
@@ -22,17 +21,22 @@ type Oml2dProps = {
 
 const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
   const oml2dRef = useRef<HTMLDivElement>(null);
-  const { messages, addMessage } = useChatStore();
 
   const getPositionX = (xAdjust = 1) => {
     if (window.innerWidth < 768) {
-      return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.05 * xAdjust : 120;
+      return oml2dRef.current
+        ? oml2dRef.current.offsetWidth * 0.05 * xAdjust
+        : 120;
     }
-    return oml2dRef.current ? oml2dRef.current.offsetWidth * 0.2 * xAdjust : 120;
+    return oml2dRef.current
+      ? oml2dRef.current.offsetWidth * 0.2 * xAdjust
+      : 120;
   };
 
   const getPositionY = (yAdjust = 1) => {
-    const containerHeight = oml2dRef.current ? oml2dRef.current.offsetHeight : 600;
+    const containerHeight = oml2dRef.current
+      ? oml2dRef.current.offsetHeight
+      : 600;
     if (window.innerWidth < 768) {
       return containerHeight * 0.05 * yAdjust;
     }
@@ -53,17 +57,6 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
     const scale = baseScale > 0.3 ? 0.3 : baseScale;
     return scale * adjustRatio;
   };
-
-  useEffect(() => {
-    if (messages.length === 0) {
-      addMessage({
-        key: Date.now(),
-        role: "ai",
-        content: "我是可爱的小猫咪，喵喵喵~",
-        timestamp: new Date(),
-      });
-    }
-  }, [messages]);
 
   useEffect(() => {
     const tipsStyle: CommonStyleType = {
@@ -122,7 +115,7 @@ const Oml2d = memo(({ oml2d, setOml2d }: Oml2dProps) => {
         },
       },
       transitionTime: 1000,
-      models: MODELS.map(model => ({
+      models: MODELS.map((model) => ({
         path: model.path,
         name: model.id,
         position: [getPositionX(model.xAdjust), getPositionY(model.yAdjust)],
