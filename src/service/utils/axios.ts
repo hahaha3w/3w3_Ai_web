@@ -1,9 +1,8 @@
+import { useTokenStore } from "@/store/token";
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: import.meta.env.MODE === "production"
-    ? import.meta.env.VITE_SERVICE_BASE_URL
-    : "/api", // 开发环境使用 /api，生产环境使用环境变量配置的 API 基础 URL
+  baseURL: import.meta.env.VITE_SERVICE_BASE_URL, // 开发环境使用 /api，生产环境使用环境变量配置的 API 基础 URL
   timeout: parseInt(import.meta.env.VITE_SERVICE_TIMEOUT || "5000"), // 使用 Vite 提供的环境变量设置请求超时时间
   headers: {
     "Content-Type": "application/json",
@@ -14,7 +13,8 @@ const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     // 在发送请求之前添加 token 或其他自定义逻辑
-    const token = localStorage.getItem("token");
+    const token = useTokenStore.getState().token
+    console.log(`get success Token ${token}`)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

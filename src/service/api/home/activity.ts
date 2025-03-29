@@ -2,7 +2,7 @@ import BaseApi from "../shared";
 import { ActivityResData, PostActivityData } from "./data";
 
 
-class ActivityApi extends BaseApi {
+export class ActivityApi extends BaseApi {
   urls = {
     activitys: "/api/activities",
   }

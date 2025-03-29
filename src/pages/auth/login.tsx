@@ -6,10 +6,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import styles from "./login.module.scss";
 import useAuthStore from "@/store/auth";
+import { useTokenStore } from "@/store/token";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const {setEmail, setToken, setUser, ...tokenData} = useTokenStore()
   const [form] = Form.useForm();
   const { setAuth } = useAuthStore();
 
@@ -23,13 +25,13 @@ const LoginPage: React.FC = () => {
       if (response && response.data) {
         // 存储用户信息和token
         const { token, ...user } = response.data;
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
+        setToken(token);
+        setUser(JSON.stringify(user));
 
         if (remember) {
-          localStorage.setItem("email", values.email);
+          setEmail(values.email);
         } else {
-          localStorage.removeItem("email");
+          setEmail("");
         }
 
         setAuth({

@@ -8,6 +8,7 @@ export default abstract class BaseApi {
   constructor() {
     //http驼峰式命名转换， post camel To snake
     this.http.defaults.transformRequest = [(data: Record<string, string>) => {
+      console.log("尝试转换")
       const snakeData: Record<string, string> = camelToSnake(data)
       return JSON.stringify(snakeData)
     }]
