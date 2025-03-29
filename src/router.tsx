@@ -27,6 +27,10 @@ const router = createHashRouter([
     element: <ChatPage />
   },
   {
+    path: '/chat/:id', // 添加带有ID参数的聊天路由
+    element: <ChatPage />
+  },
+  {
     path: '/auth/login',
     element: <LoginPage />
   },
