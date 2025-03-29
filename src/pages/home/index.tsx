@@ -13,7 +13,7 @@ import { useQueries } from 'node_modules/@tanstack/react-query/build/legacy'
 const HomePage = () => {
   useAuth()
 
-  const {data} = useQuery(
+  const {data, isLoading} = useQuery(
     {
       queryKey: [ApiKeys.userInfo],
       queryFn: () => Api.userApi.getUserInfo()
@@ -25,7 +25,8 @@ const HomePage = () => {
       <AIStatus {... {
         chat: data?.chatCount,
         memoir: data?.memoirCount,
-        useDay: data?.useDay
+        useDay: data?.useDay,
+        isLoading
       }} ></AIStatus>
       {/* <Activity></Activity> */}
       <Memoir></Memoir>
