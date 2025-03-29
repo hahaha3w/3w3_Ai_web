@@ -1,7 +1,7 @@
 import BaseApi from "../shared";
-import { MemoirDeleteRes, MemoirResData, MemoirResListData } from "./data";
+import { MemoirDeleteRes, MemoirResData, MemoirResListData } from "./types";
 
-export class MemoirApi extends BaseApi {
+class MemoirApi extends BaseApi {
   urls = {
     memoirList: "/memoir/list",
     memoir: "/memoir"
@@ -24,3 +24,5 @@ export class MemoirApi extends BaseApi {
     return responseData.data
   }
 }
+
+export const memoirApi = new MemoirApi()

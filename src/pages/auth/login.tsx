@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       const { remember, ...loginData } = values;
 
-      const response = await Api.Auth.login(loginData);
+      const response = await Api.authApi.login(loginData);
 
       if (response && response.data) {
         // 存储用户信息和token

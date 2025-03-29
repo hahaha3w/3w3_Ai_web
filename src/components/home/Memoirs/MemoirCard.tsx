@@ -1,12 +1,12 @@
 import { FC } from "react";
 import { dateCalc } from "@/utils/dateCalc";
 import { Button } from "antd";
-import { MemoirData } from "@/service/api/home/data";
+import { MemoirData } from "@/service/api/home/types";
 import { strLimit } from "@/utils/strLimit";
 
 const MemoirCard:FC<MemoirData> = (props) => {
   return (
-    <div className="col-center grow p-4 shadow rounded-2xl gap-2"> 
+    <div className="col-center grow p-4 shadow rounded-2xl gap-2 min-w-[200px]"> 
       <div className="w-full flex flex-row justify-between">
         <p className="text-sm text-gray-300">{dateCalc(props.createdAt)}</p>
         {/**TODO Icon 预留 */}

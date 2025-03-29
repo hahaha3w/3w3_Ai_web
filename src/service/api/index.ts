@@ -1,16 +1,16 @@
-import Auth from "./auth";
-import Chat from "./chat";
-import User from "./user";
-import Test from "./test";
-import { MemoirApi } from "./home/memoir";
-import {ActivityApi} from "./home/activity"
+import { authApi } from "./auth";
+import { chatApi } from "./chat";
+import { userApi } from "./user/user";
+import { testApi } from "./test";
+import { memoirApi } from "./home/memoir";
+import { activityApi }from "./home/activity"
 const Api = {
-  Auth,
-  Chat,
-  User,
-  Test,
-  memoirApi: new MemoirApi(),
-  activityApi: new ActivityApi(),
+  authApi,
+  chatApi,
+  userApi,
+  testApi,
+  memoirApi,
+  activityApi,
 };
 
 export default Api;

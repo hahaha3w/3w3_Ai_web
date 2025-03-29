@@ -2,16 +2,32 @@ import Activity from '@/components/home/Activity/Activity'
 import Memoir from '@/components/home/Memoirs/Memoir'
 import AIStatus from '@/components/home/Status'
 import UserCard from '@/components/home/UserCard'
+import { ApiKeys } from '@/constants/apiKeys'
 import { useAuth } from '@/hooks/useAuth'
+import Api from '@/service/api'
 import useAuthStore from '@/store/auth'
+import { useQuery } from '@tanstack/react-query'
+import { useQueries } from 'node_modules/@tanstack/react-query/build/legacy'
+
 
 const HomePage = () => {
   useAuth()
+
+  const {data} = useQuery(
+    {
+      queryKey: [ApiKeys.userInfo],
+      queryFn: () => Api.userApi.getUserInfo()
+    }
+  )
   return (
     <div className='w-[90%] m-auto flex flex-col gap-6 justify-start items-center p-10 scroll-auto'>
       <UserCard></UserCard>
-      <AIStatus></AIStatus>
-      <Activity></Activity>
+      <AIStatus {... {
+        chat: data?.chatCount,
+        memoir: data?.memoirCount,
+        useDay: data?.useDay
+      }} ></AIStatus>
+      {/* <Activity></Activity> */}
       <Memoir></Memoir>
     </div>
   )

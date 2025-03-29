@@ -43,7 +43,7 @@ const RegisterPage: React.FC = () => {
       }
 
       setSendingCode(true);
-      const response = await Api.Auth.sendCode({ email });
+      const response = await Api.authApi.sendCode({ email });
       if (response && response.data) {
         message.success('验证码已发送，请查收邮件');
         startCountdown();
@@ -58,7 +58,7 @@ const RegisterPage: React.FC = () => {
   const onFinish = async (values: RegisterReq) => {
     try {
       setLoading(true);
-      const response = await Api.Auth.register(values);
+      const response = await Api.authApi.register(values);
       console.log(response);
 
       if (response && response.data) {

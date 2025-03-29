@@ -1,6 +1,6 @@
 import { http } from "../utils/axios";
 
-class Test {
+class TestApi {
   private static urls = {
     subscribe: "/sse",
   };
@@ -37,4 +37,4 @@ class Test {
   }
 }
 
-export default Test;
+export const testApi = new TestApi();

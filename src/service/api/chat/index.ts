@@ -52,4 +52,4 @@ class Chat extends BaseApi {
   }
 }
 
-export default new Chat();
+export const chatApi = new Chat();

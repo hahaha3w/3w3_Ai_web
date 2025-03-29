@@ -3,7 +3,7 @@ import { FC } from "react"
 interface StatusCardProps {
   icon: string,
   title: string,
-  num: number
+  num?: number
 }
 
 const StatusCard: FC<StatusCardProps> = ({icon, title, num}) => {
@@ -12,7 +12,11 @@ const StatusCard: FC<StatusCardProps> = ({icon, title, num}) => {
       <img className="w-[20px]" src={icon}/>
       <div className="flex flex-col justify-between items-start">
         <p className="text-xl">{title}</p>
-        <p className="text-2xl font-bold">{num}</p>
+        {
+          num != undefined 
+          ? <p className="text-2xl font-bold">{num}</p>
+          : <p >加载中</p>
+        }
       </div>
     </div>
   )

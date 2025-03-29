@@ -45,8 +45,8 @@ export interface RegisterResData {
   email: string;
   theme: string;
   token: string;
-  use_day: number;
-  user_id: number;
+  useDay: number;
+  userId: number;
   username: string;
   [property: string]: any;
 }
@@ -69,3 +69,14 @@ export interface DeleteAccountResData {
   [property: string]: any;
 }
 
+export interface UserInfoResData {
+  avatar: string;
+  bio: string;
+  chatCount: number;
+  email: string;
+  memoirCount: number;
+  theme: string;
+  useDay: number;
+  userId: number;
+  username: string;
+}

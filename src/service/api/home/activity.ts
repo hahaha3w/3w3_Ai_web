@@ -1,10 +1,10 @@
 import BaseApi from "../shared";
-import { ActivityResData, PostActivityData } from "./data";
+import { ActivityResData, PostActivityData } from "./types";
 
 
-export class ActivityApi extends BaseApi {
+ class ActivityApi extends BaseApi {
   urls = {
-    activitys: "/api/activities",
+    activitys: "/activities",
   }
   tag = "Activity"
 
@@ -18,5 +18,4 @@ export class ActivityApi extends BaseApi {
   }
 }
 
-const activityApi = new ActivityApi()
-export default activityApi
+export const activityApi = new ActivityApi()

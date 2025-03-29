@@ -43,7 +43,7 @@ const ChangePasswordPage: React.FC = () => {
       }
 
       setSendingCode(true);
-      const response = await Api.Auth.sendCode({ email });
+      const response = await Api.authApi.sendCode({ email });
       if (response && response.data) {
         message.success('验证码已发送，请查收邮件');
         startCountdown();
@@ -60,7 +60,7 @@ const ChangePasswordPage: React.FC = () => {
       setLoading(true);
       const { confirmPassword, ...changePasswordData } = values;
       
-      const response = await Api.Auth.changePassword(changePasswordData);
+      const response = await Api.authApi.changePassword(changePasswordData);
 
       if (response && response.data) {
         message.success('密码修改成功');
