@@ -2,6 +2,7 @@ import Activity from '@/components/home/Activity/Activity'
 import Memoir from '@/components/home/Memoirs/Memoir'
 import AIStatus from '@/components/home/Status'
 import UserCard from '@/components/home/UserCard'
+import { ModalBox } from '@/components/ModalBox/ModalBox'
 import { ApiKeys } from '@/constants/apiKeys'
 import { useAuth } from '@/hooks/useAuth'
 import Api from '@/service/api'
@@ -21,7 +22,7 @@ const HomePage = () => {
   )
   return (
     <div className='w-[90%] m-auto flex flex-col gap-6 justify-start items-center p-10 scroll-auto'>
-      <UserCard></UserCard>
+      <UserCard userName={data?.username}></UserCard>
       <AIStatus {... {
         chat: data?.chatCount,
         memoir: data?.memoirCount,
@@ -30,6 +31,7 @@ const HomePage = () => {
       }} ></AIStatus>
       {/* <Activity></Activity> */}
       <Memoir></Memoir>
+      <ModalBox></ModalBox>
     </div>
   )
 }

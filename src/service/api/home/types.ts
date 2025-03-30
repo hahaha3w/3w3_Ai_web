@@ -45,10 +45,10 @@ export interface MemoirResListData {
 }
 
 export interface MemoirResData {
-  memoirs: MemoirData[],
+  memoir: MemoirData,
 }
 
 export interface MemoirDeleteRes {
-  success: boolean,
-  errorMsg: string
+  success?: boolean,
+  errorMsg?: string
 }

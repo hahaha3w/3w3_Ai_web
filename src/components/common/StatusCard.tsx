@@ -1,6 +1,7 @@
 import { FC, useContext } from "react"
 import { UserInfoStatusContext } from "../home/Status"
 import { Spin } from "antd"
+import { SmileOutlined } from "@ant-design/icons"
 
 interface StatusCardProps {
   icon: string,

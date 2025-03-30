@@ -125,8 +125,8 @@ button {
 .chatList {
   padding: 0 16px;
   margin-bottom: 80px;
-  max-height: 300px; // 限制最大高度
-  overflow-y: auto; // 添加垂直滚动条
+  height: 254px; // 限制最大高度
+  overflow-y: scroll; // 添加垂直滚动条
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0) 0%,

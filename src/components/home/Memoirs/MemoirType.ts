@@ -7,6 +7,9 @@ export interface MemoirData {
   des: string,
 }
 
+
+export const mockText = " 时政微观察丨“投我以木桃，报之以琼瑶”与中国同行 与机遇同行 广东自动驾驶开上“快车道” 青海绿电跑出“超算速”【文化中国行】广西三月三：春满八桂欢乐多广西，是什么颜色的？人机共创！这是一场AI与正能量的双向奔赴蛇形机器人来了！70+高校前沿科技成果同时亮相为“工业风”注入“文化魂”为共创亚洲美好未来贡献智慧和力量跨越太平洋的“无蚊”之约"
+
 export const memoirsMockData: MemoirData[] = [
   {
     id: 1,

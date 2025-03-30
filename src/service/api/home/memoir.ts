@@ -1,5 +1,6 @@
+import { AxiosResponse } from "axios";
 import BaseApi from "../shared";
-import { MemoirDeleteRes, MemoirResData, MemoirResListData } from "./types";
+import { MemoirData, MemoirDeleteRes, MemoirResData, MemoirResListData } from "./types";
 
 class MemoirApi extends BaseApi {
   urls = {
@@ -19,9 +20,10 @@ class MemoirApi extends BaseApi {
     return responseData.data
   }
 
-  async deleteResponseData(id: number): Promise<MemoirDeleteRes> {
+  async deleteResponseData(id: number): Promise<AxiosResponse<MemoirDeleteRes>> {
+    console.log("delete memoir data, id: ", id)
     const responseData = await this.http.delete<MemoirDeleteRes>(`${this.urls.memoir}/${id}`)
-    return responseData.data
+    return responseData
   }
 }
 

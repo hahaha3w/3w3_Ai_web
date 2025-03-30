@@ -29,7 +29,6 @@ export const createPersistedStore = <State extends object , Actions extends obje
 
 
 export const createImmerStore = <State extends object , Actions extends object>(
-  key: string,
   initValues: State, 
   actions: (set: StoreApi<State & Actions>['setState']) => Actions
 ) => create(

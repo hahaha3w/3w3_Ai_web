@@ -1,4 +1,7 @@
-export const strLimit = (str: string, limit: number = 10): string => {
+export const strLimit = (str?: string, limit: number = 10): string => {
+  if (!str) {
+    return "";
+  }
   if (str.length > limit) {
     return str.slice(0, limit) + "...";
   }

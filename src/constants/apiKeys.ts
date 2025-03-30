@@ -3,5 +3,6 @@
 export const ApiKeys = {
   userInfo: "userInfo",
   activityList: "activityList",
-  memoirList: "memoirList"
+  memoirList: "memoirList",
+  memoir: "memoir"
 }
