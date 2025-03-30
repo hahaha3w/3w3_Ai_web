@@ -14,6 +14,7 @@ import SidebarHeader from "./SidebarHeader";
 import ModelSelector from "./ModelSelector";
 import ChatList from "./ChatList";
 import MoodSelector from "./MoodSelector";
+import { Conversation } from "@/service/api/chat/types";
 
 interface SidebarProps {
   visible: boolean;
@@ -33,10 +34,11 @@ const Sidebar: React.FC<SidebarProps> = memo(
     const [loading, setLoading] = useState<boolean>(false);
     const [isCreatingChat, setIsCreatingChat] = useState<boolean>(false);
     const [fetchingChats, setFetchingChats] = useState<boolean>(false);
+    const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
     const navigate = useNavigate();
 
     // 获取对话列表
-    const fetchConversationList = async () => {
+    const fetchConversationList = async (): Promise<Conversation[]> => {
       try {
         setFetchingChats(true);
         const response = await Api.chatApi.getConversationList({
@@ -50,12 +52,16 @@ const Sidebar: React.FC<SidebarProps> = memo(
           if (!currentChatId && response.data.conversations.length > 0) {
             setCurrentChat(response.data.conversations[0].conversationId);
           }
+          
+          return response.data.conversations;
         } else {
           message.error("获取对话列表失败");
+          return [];
         }
       } catch (error) {
         console.error("获取对话列表失败:", error);
         message.error("获取对话列表失败，请刷新重试");
+        return [];
       } finally {
         setFetchingChats(false);
       }
@@ -63,12 +69,64 @@ const Sidebar: React.FC<SidebarProps> = memo(
 
     // 组件挂载时获取对话列表
     useEffect(() => {
-      fetchConversationList();
+      const initializeApp = async () => {
+        const conversations = await fetchConversationList();
+        setInitialLoadComplete(true);
+        
+        // 初始化完成后，处理当前URL中的ID
+        if (id && id !== "new" && !isCreatingChat && !loading) {
+          const chatId = Number(id);
+          
+          if (!isNaN(chatId)) {
+            // 检查获取到的对话列表中是否包含该ID
+            const chatExists = conversations.some(chat => chat.conversationId === chatId);
+            
+            if (chatExists) {
+              // 如果对话存在，设置为当前对话
+              setCurrentChat(chatId);
+              
+              // 加载对话消息历史
+              try {
+                setLoading(true);
+                const response = await Api.chatApi.getMsgHistory({
+                  conversationId: chatId,
+                  pageNum: 1,
+                  pageSize: 50,
+                });
+                
+                if (response.data && response.data.messages) {
+                  useChatStore.getState().setMessages(response.data.messages.reverse());
+                } else {
+                  useChatStore.getState().clearMessages();
+                }
+              } catch (error) {
+                console.error("加载对话消息失败:", error);
+                message.error("加载对话消息失败，请重试");
+                useChatStore.getState().clearMessages();
+              } finally {
+                setLoading(false);
+              }
+            } else {
+              // 如果对话不存在，显示警告并导航到列表中的第一个对话
+              message.warning("未找到对应的对话");
+              if (conversations.length > 0) {
+                const firstChatId = conversations[0].conversationId;
+                setCurrentChat(firstChatId);
+                navigate(`/chat/${firstChatId}`, { replace: true });
+              } else {
+                navigate("/chat/new", { replace: true });
+              }
+            }
+          }
+        }
+      };
+      
+      initializeApp();
     }, []);
 
-    // ID 变更时的处理逻辑
+    // ID 变更时的处理逻辑 - 只在初始化加载完成后执行
     useEffect(() => {
-      if (isCreatingChat || loading) return;
+      if (!initialLoadComplete || isCreatingChat || loading) return;
 
       // 处理新建对话请求
       const handleNewChatRequest = async () => {
@@ -102,7 +160,6 @@ const Sidebar: React.FC<SidebarProps> = memo(
           message.error("创建对话失败，请稍后重试");
 
           // 创建失败时仍然重新获取对话列表
-
           await fetchConversationList();
 
           // 如果有现有对话，选择第一个
@@ -129,9 +186,12 @@ const Sidebar: React.FC<SidebarProps> = memo(
 
         try {
           setLoading(true);
-
-          // 先检查列表中是否已有该对话
-          const chat = chatList.find((chat) => chat.conversationId === chatId);
+          
+          // 确保先获取最新的对话列表
+          const conversations = await fetchConversationList();
+          
+          // 检查对话是否存在
+          const chat = conversations.find(chat => chat.conversationId === chatId);
 
           if (chat) {
             // 如果找到了，设置当前对话并加载消息
@@ -154,26 +214,14 @@ const Sidebar: React.FC<SidebarProps> = memo(
               useChatStore.getState().clearMessages();
             }
           } else {
-            // 如果没找到，重新获取对话列表
-            await fetchConversationList();
-
-            // 再次检查是否找到对话
-            const refreshedChat = chatList.find(
-              (chat) => chat.conversationId === chatId
-            );
-
-            if (refreshedChat) {
-              setCurrentChat(refreshedChat.conversationId);
+            // 如果依然没找到，提示并跳转到第一个对话或创建新对话
+            message.warning("未找到对应的对话");
+            if (conversations.length > 0) {
+              const firstChatId = conversations[0].conversationId;
+              setCurrentChat(firstChatId);
+              navigate(`/chat/${firstChatId}`, { replace: true });
             } else {
-              // 如果依然没找到，提示并跳转到第一个对话或创建新对话
-              message.warning("未找到对应的对话");
-              if (chatList.length > 0) {
-                const firstChatId = chatList[0].conversationId;
-                setCurrentChat(firstChatId);
-                navigate(`/chat/${firstChatId}`, { replace: true });
-              } else {
-                navigate("/chat/new", { replace: true });
-              }
+              navigate("/chat/new", { replace: true });
             }
           }
         } catch (error) {
@@ -202,7 +250,7 @@ const Sidebar: React.FC<SidebarProps> = memo(
           navigate("/");
         }
       }
-    }, [id, isCreatingChat, loading, currentChatId, chatList, navigate]);
+    }, [id, isCreatingChat, loading, currentChatId, initialLoadComplete, navigate]);
 
     // 处理模型切换
     const handleModelChange = (index: number) => {
