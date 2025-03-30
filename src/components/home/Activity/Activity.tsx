@@ -1,8 +1,9 @@
 import { FC } from "react"
 import { mockData } from "./ActivityType"
 import ActivityCard from "./ActivityCard"
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import Api from "@/service/api"
+import { ApiKeys } from "@/constants/apiKeys"
 
 
 
@@ -13,9 +14,12 @@ const Activity: FC = () => {
    */
 
   const {data, isPending, isError} = useQuery({
-    queryKey: ['activitys'],
+    queryKey: [ApiKeys.activityList],
     queryFn: () => Api.activityApi.getActivities()
   })
+
+  
+
   
   return (
     <div className="w-full h-[600px] p-4 flex flex-col items-start gap-4 ">

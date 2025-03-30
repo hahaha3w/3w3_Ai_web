@@ -13,9 +13,8 @@ const MemoirCard:FC<MemoirData> = (props) => {
         <p className="text-sm text-gray-300">{dateCalc(props.createdAt)}</p>
         {/**TODO Icon 预留 */}
       </div>
-      {/* <div className="w-full flex flex-row justify-start text-xl font-black">{strLimit(props.title)}</div> */}
-      <div className="w-full flex flex-row justify-start text-xl font-black">{"回忆录MOCK标题"}</div>
-      <div className="w-full text-wrap line-clamp-2 text-base text-gray-400">{"今天我很开心，有很多的朋友陪我，能够收获很多友情"}</div>
+      <div className="w-full flex flex-row justify-start text-xl font-black">{strLimit(props.title ?? "默认标题")}</div>
+      <div className="w-full text-wrap line-clamp-2 text-base text-gray-400">{props.content}</div>
       {/**功能区 */}
       <div className="w-full flex flex-row justify-between">
         <Button type="primary" className="shrink-1" onClick={() => {

@@ -34,7 +34,7 @@ const Memoir: FC = () => {
   }, [refetch, setRefetchMemoirList])
   return (
     <div className="w-full h-[600px] p-4 flex flex-col items-start gap-4 ">
-      <p className="text-xl font-bold">回忆录(展示最近15条)</p>
+      <p className="text-xl font-bold">回忆录(可往下滚动刷新)</p>
         {status === 'pending' && <Spin className=" self-center" indicator={<LoadingOutlined  style={{ fontSize: 60}} spin></LoadingOutlined>} size="large" /> }
         { data ? 
           <div className="h-[600px] overflow-auto" id="scrollable_memoir_list">

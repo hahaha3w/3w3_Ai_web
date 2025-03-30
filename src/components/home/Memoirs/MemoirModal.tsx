@@ -26,7 +26,7 @@ export const MemoirModal: FC<MemoirModalProps> = (props) => {
   const deleteData = useCallback(async () => {
     setIsDeleting(true)
     const axiosRes = await Api.memoirApi.deleteResponseData(props.id)
-    if (axiosRes.status != 200) {
+    if (!axiosRes.data.success) {
       setIsDeleting(false)
       message.error(`删除失败, error: ${axiosRes?.data?.errorMsg}`)
       hiddenBox()
@@ -42,8 +42,7 @@ export const MemoirModal: FC<MemoirModalProps> = (props) => {
     if (!data) return <div>空</div>
     return (
       <div className="col-center gap-4 w-full ">
-        {/* <div className="text-xl text-wrap">{data.memoir.content}</div> */}
-        <div className="text-base text-wrap grow overflow-scroll">{mockText+"\n"+mockText+mockText}</div>
+        <div className="text-xl text-wrap">{data.memoir.content}</div>
         <div className="text-sm self-start text-gray-400">{dateCalc(data.memoir.createdAt)}</div>
       </div>
     )
@@ -56,7 +55,14 @@ export const MemoirModal: FC<MemoirModalProps> = (props) => {
     loading={isLoading}
     title={data?.memoir.title ?? "开心的一天"}
     onClose={() => hiddenBox()}
-    onCancel={() => hiddenBox()}
+    onCancel={() => {
+      hiddenBox()
+      
+      if (refetchMemoirList) {
+        console.log("refetchData")
+        refetchMemoirList()
+      }
+    }}
     width={'50%'}
     // height={'80%'}
     footer={[
