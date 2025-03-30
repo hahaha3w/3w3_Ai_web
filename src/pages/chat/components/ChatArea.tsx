@@ -132,11 +132,29 @@ const MessageList = memo(
       return () => {
         if (closeEventSource.current) {
           closeEventSource.current();
+          closeEventSource.current = null;
         }
         if (updateTimerRef.current) {
           clearTimeout(updateTimerRef.current);
+          updateTimerRef.current = null;
         }
       };
+    }, []);
+
+    // 取消发送请求的处理函数
+    const handleCancel = useCallback(() => {
+      setLoading(false);
+      if (closeEventSource.current) {
+        closeEventSource.current();
+        closeEventSource.current = null;
+      }
+      // 如果有临时消息ID，清除它
+      if (tempMessageIdRef.current) {
+        // 可以选择删除该消息或标记为已取消
+        tempMessageIdRef.current = null;
+      }
+      // 重置AI响应
+      aiResponseRef.current = "";
     }, []);
 
     // 作为单独的Effect处理消息更新，防止与渲染循环交叉
@@ -299,13 +317,7 @@ const MessageList = memo(
             handleSend(value);
           }}
           placeholder="聊点什么呢？"
-          onCancel={() => {
-            setLoading(false);
-            if (closeEventSource.current) {
-              closeEventSource.current();
-              closeEventSource.current = null;
-            }
-          }}
+          onCancel={handleCancel}
           actions={(_, info) => {
             const { SendButton, LoadingButton } = info.components;
 

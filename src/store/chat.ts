@@ -7,6 +7,7 @@ interface ChatMessage {
   role: "ai" | "user";
   content: string;
   timestamp: Date;
+  loding: boolean;
 }
 
 // 将后端消息格式转换为组件所需格式
@@ -16,6 +17,7 @@ const convertMessageToChatMessage = (message: Message): ChatMessage => {
     role: message.senderType === "ai" ? "ai" : "user",
     content: message.content,
     timestamp: new Date(message.sendTime),
+    loding: true
   };
 };
 

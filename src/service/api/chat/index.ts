@@ -13,12 +13,15 @@ class Chat extends BaseApi {
 
   async sendMsg(data: SendMsgReq, onMsg: (data: any) => void, onError?: (error: unknown) => void) {
     let isCompleted = false;
+    let controller: AbortController | null = new AbortController();
+    
     try {
       let lastProcessedLength = 0;
 
-      return await this.http.get(this.urls.sendMsg, {
+      const response = this.http.get(this.urls.sendMsg, {
         params: data,
         responseType: 'text',
+        signal: controller.signal,
         onDownloadProgress: (progressEvent) => {
           try {
             const responseText = progressEvent.event?.target?.response || '';
@@ -57,8 +60,24 @@ class Chat extends BaseApi {
           }
         }
       });
+      
+      // 返回一个清理函数，可用于取消请求
+      return () => {
+        if (controller) {
+          controller.abort();
+          controller = null;
+          console.log("Request aborted by user");
+        }
+      };
     } catch (error) {
       console.error("Error in sendMsg:", error);
+      // 确保在出错时也能清理资源
+      return () => {
+        if (controller) {
+          controller.abort();
+          controller = null;
+        }
+      };
     }
   }
 
