@@ -35,8 +35,9 @@ const Memoir: FC = () => {
       <p className="text-xl font-bold">回忆录(可往下滚动刷新)</p>
         {status === 'pending' && <Spin className=" self-center" indicator={<LoadingOutlined  style={{ fontSize: 60}} spin></LoadingOutlined>} size="large" /> }
         { data ? 
-          <div className="h-[600px] overflow-auto" id="scrollable_memoir_list">
+          <div className="h-[600px] overflow-auto w-full" id="scrollable_memoir_list">
             <InfiniteScroll
+              className="w-full"
               dataLength={data?.pages.reduce((total, page) => total + page.memoirs.length, 0) || 0}
               next={() => {
                 console.log("refetch next")
@@ -67,14 +68,21 @@ const Memoir: FC = () => {
               }
               scrollableTarget="scrollable_memoir_list"
             >
-              <div className="w-full p-4 grid grid-flow-row grid-cols-3 gap-2">
-                { data.pages.length != 0 
-                  ? data.pages.map(memoirList => {
-                    return memoirList.memoirs.map((item) => <MemoirCard {...item} id={item.id}></MemoirCard>)
-                  })
-                  : <Empty />
+              
+                { data.pages[0].memoirs.length != 0 
+                  ? 
+                  <div className="w-full p-4 grid grid-flow-row grid-cols-3 gap-2">
+                    {
+                    data.pages.map(memoirList => {
+                      return memoirList.memoirs.map((item) => <MemoirCard {...item} id={item.id}></MemoirCard>)
+                    })
+                  }
+                  </div>
+                  : 
+                  <div className="w-full col-center">
+                    <Empty description={"暂无数据哦"}/>
+                  </div>
                 }
-              </div>
             </InfiniteScroll>
           </div>
           : null
