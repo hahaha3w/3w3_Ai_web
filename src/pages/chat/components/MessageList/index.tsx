@@ -2,10 +2,15 @@ import { Bubble, Sender } from "@ant-design/x";
 import Api from "@/service/api";
 import useChatStore from "@/store/chat";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
-import { GetProp, GetRef, Spin, Tooltip, message } from "antd";
+import { GetProp, GetRef, Spin, Tooltip, Typography, message } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import styles from "../ChatArea.module.scss";
+import markdownit from "markdown-it";
+import "./MarkdownStyles.scss";
+
+// 初始化markdown-it
+const md = markdownit({ html: true, breaks: true });
 
 // 角色样式配置
 const rolesAsObject: GetProp<typeof Bubble.List, "roles"> = {
@@ -22,6 +27,12 @@ const rolesAsObject: GetProp<typeof Bubble.List, "roles"> = {
         background: "rgba(0,0,0,0.5)",
       },
     },
+    // 添加Markdown渲染函数
+    messageRender: (content) => (
+      <Typography>
+        <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
+      </Typography>
+    ),
   },
   user: {
     placement: "end",
@@ -283,7 +294,7 @@ const MessageList = memo(
 
         {/* 消息气泡列表 */}
         <Bubble.List
-          className={styles.bubbleListContainer}
+          className={`${styles.bubbleListContainer} markdown-enabled`}
           ref={listRef}
           roles={rolesAsObject}
           items={messages}

@@ -1,0 +1,88 @@
+.markdown-enabled {
+  .ant-typography {
+    color: inherit;
+    
+    h1, h2, h3, h4, h5, h6 {
+      color: inherit;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+    }
+    
+    h1 {
+      font-size: 1.5em;
+    }
+    
+    h2 {
+      font-size: 1.3em;
+    }
+    
+    h3 {
+      font-size: 1.2em;
+    }
+    
+    p {
+      margin-bottom: 1em;
+    }
+    
+    ul, ol {
+      margin-left: 1.5em;
+      margin-bottom: 1em;
+    }
+    
+    code {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    
+    pre {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 1em;
+      
+      code {
+        background-color: transparent;
+        padding: 0;
+      }
+    }
+    
+    blockquote {
+      border-left: 4px solid rgba(255, 255, 255, 0.3);
+      padding-left: 1em;
+      margin-left: 0;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    a {
+      color: #1890ff;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 1em;
+      
+      th, td {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5em;
+      }
+      
+      th {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+}
