@@ -9,5 +9,6 @@ export const useAuth = () => {
     if (!token.token) {
       navigate("/auth/login")
     }
+    
   }, [token.token, navigate]) 
 }

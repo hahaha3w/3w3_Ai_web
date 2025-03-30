@@ -1,3 +1,5 @@
+import { useTokenStore } from "@/store/token"
+import { Button, Popover } from "antd"
 
 interface NavIconProps {
   iconImg: string,
@@ -5,6 +7,7 @@ interface NavIconProps {
   onClick: () => void
 }
 export default function NavIcon({iconImg, iconText, onClick}: NavIconProps) {
+  const {clearToken} = useTokenStore()
   return (
     <div className='col-center flex-col' onClick={onClick}>
       <img src={iconImg} className='w-[20px]'/>
