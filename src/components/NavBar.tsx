@@ -16,7 +16,6 @@ const NavBar = () => {
           </div>
         </div>
         <NavIcon onClick={() => {}} iconImg={home} iconText="主页"></NavIcon>
-        <NavIcon onClick={() => {}} iconImg={chat} iconText="聊天"></NavIcon>
       </div>
     </div>
   )

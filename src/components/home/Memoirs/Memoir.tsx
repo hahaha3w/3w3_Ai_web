@@ -12,7 +12,6 @@ import { ApiKeys } from "@/constants/apiKeys"
 
 const Memoir: FC = () => {
   const {setRefetchMemoirList} = useRefetchStore()
-  const [total, setTotal] = useState(32)
 
   const {data, status, error, refetch, fetchNextPage, isRefetching} = useInfiniteQuery({
     queryKey: [ApiKeys.memoirList],
@@ -20,7 +19,6 @@ const Memoir: FC = () => {
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages, lastPageParam) => {
       if (!lastPage.memoirs.length) return undefined
-      // setTotal(lastPage.total)
       return lastPageParam + 1
     }
   })
@@ -44,7 +42,7 @@ const Memoir: FC = () => {
                 console.log("refetch next")
                 if(!isRefetching) fetchNextPage()
               }}
-              hasMore={total > data?.pages.reduce((total, page) => total + page.memoirs.length, 0)}
+              hasMore={data.pages[data.pages.length - 1].hasMore}
               refreshFunction={()=> {if(!isRefetching)refetch()}}
               pullDownToRefresh
               pullDownToRefreshThreshold={50}

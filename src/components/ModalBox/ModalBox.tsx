@@ -1,8 +1,7 @@
 import { ModelBoxType, useModalBoxStore } from "@/store/modal"
 import { Modal } from "antd"
-import { useMemo } from "react"
+import { createContext, useMemo } from "react"
 import { MemoirModal } from "../home/Memoirs/MemoirModal"
-
 
 export const ModalBox = () => {
   const {currentId, type} = useModalBoxStore()
@@ -11,10 +10,10 @@ export const ModalBox = () => {
   }, [type, currentId])
   if (!isShow) return <></>
   return (
-  <div>
-    {
-      type == ModelBoxType.MEMOIR_BOX && <MemoirModal isOpen={isShow} id={currentId ?? 0}></MemoirModal>
-    }
-  </div>
+    <div className="w-[50%] min-w-[300px] max-w-[800px]:">
+        {
+          type == ModelBoxType.MEMOIR_BOX && <MemoirModal isOpen={isShow} id={currentId ?? 0}></MemoirModal>
+        }
+   </div>
   )
 }

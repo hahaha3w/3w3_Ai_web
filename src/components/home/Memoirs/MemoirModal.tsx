@@ -2,11 +2,12 @@ import { ApiKeys } from "@/constants/apiKeys";
 import Api from "@/service/api";
 import { useModalBoxStore } from "@/store/modal";
 import { useQuery } from "@tanstack/react-query";
-import { Button, message, Modal } from "antd";
-import { FC, useCallback, useMemo, useState } from "react";
+import { Button, Empty, message, Modal } from "antd";
+import { FC, useCallback, useContext, useMemo, useState } from "react";
 import { mockText } from "./MemoirType";
 import { dateCalc } from "@/utils/dateCalc";
 import { useRefetchStore } from "@/store/refetch";
+import { emptyOrItem } from "@/utils/strLimit";
 
 
 interface MemoirModalProps {
@@ -38,22 +39,34 @@ export const MemoirModal: FC<MemoirModalProps> = (props) => {
     }
   }, [hiddenBox, props.id,  refetchMemoirList])
 
+  const formatContent = useCallback((content: string) => {
+    return content
+      .split("\n")
+      .map((line) => `    ${line}`) // 在每一行前添加两个空格
+      .join("\n");
+  }, []);
+  
+
   const modalCompo = useCallback(() => {
     if (!data) return <div>空</div>
     return (
-      <div className="col-center gap-4 w-full ">
-        <div className="text-xl text-wrap">{data.memoir.content}</div>
-        <div className="text-sm self-start text-gray-400">{dateCalc(data.memoir.createdAt)}</div>
+      <div className="col-center gap-4 w-full h-full  ">
+        {
+          emptyOrItem(data.content)
+           ? <div className="text-xl text-wrap whitespace-pre-wrap">{emptyOrItem(formatContent(data?.content))}</div>
+           : <Empty description="回忆录呢? AI脑袋空空的~"></Empty>
+        }
+        <div className="text-sm self-start text-gray-400">{dateCalc(data.createdAt)}</div>
       </div>
     )
   }, [data])
 
   return (
   <Modal 
-    className=" max-h-[80%] absolute"
+    className="min-w-[500px] absolute"
     open={props.isOpen}
     loading={isLoading}
-    title={data?.memoir.title ?? "开心的一天"}
+    title={emptyOrItem(data?.title) ?? "默认标题"}
     onClose={() => hiddenBox()}
     onCancel={() => {
       hiddenBox()
@@ -64,7 +77,6 @@ export const MemoirModal: FC<MemoirModalProps> = (props) => {
       }
     }}
     width={'50%'}
-    // height={'80%'}
     footer={[
       <Button danger loading={isDeleting} onClick={deleteData}>
         删除

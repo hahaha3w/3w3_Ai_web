@@ -24,7 +24,8 @@ export interface ActivityResData {
   activities: ActivityData[],
   chatCount: number,
   memoirCount: number,
-  useDay: number
+  useDay: number,
+  hasMore: boolean,
 }
 
 export interface MemoirData {
@@ -42,6 +43,7 @@ export interface MemoirData {
 export interface MemoirResListData {
   memoirs: MemoirData[],
   total: number,
+  hasMore: boolean,
 }
 
 export interface MemoirResData {

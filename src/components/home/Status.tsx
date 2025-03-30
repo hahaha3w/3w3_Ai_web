@@ -1,4 +1,6 @@
 import chat from "@/assets/chat.svg"
+import memoir from "@/assets/memoir.svg"
+import useDays from "@/assets/useDays.svg"
 import StatusCard from '../common/StatusCard'
 import { createContext, FC } from "react"
 import { UserInfoData } from "@/service/api/user/types"
@@ -17,8 +19,8 @@ const AIStatus = (props: StatusType) => {
     <UserInfoStatusContext.Provider value={props.isLoading}>
       <div className='w-full row-center flex-row gap-4'>
         <StatusCard icon={chat} title='聊天' num={props.chat}></StatusCard>
-        <StatusCard icon={chat} title='回忆录' num={props.memoir}></StatusCard>
-        <StatusCard icon={chat} title='使用天数' num={props.useDay}></StatusCard>
+        <StatusCard icon={memoir} title='回忆录' num={props.memoir}></StatusCard>
+        <StatusCard icon={useDays} title='使用天数' num={props.useDay}></StatusCard>
       </div>
     </UserInfoStatusContext.Provider>
   )

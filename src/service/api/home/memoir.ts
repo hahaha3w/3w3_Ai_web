@@ -15,7 +15,7 @@ class MemoirApi extends BaseApi {
   }
 
   async getMemoirDetail(id: number) {
-    const responseData = await this.http.get<MemoirResData>(`${this.urls.memoir}/${id}`)
+    const responseData = await this.http.get<MemoirData>(`${this.urls.memoir}/${id}`)
     return responseData.data
   }
 

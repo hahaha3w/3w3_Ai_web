@@ -13,12 +13,10 @@ const MessageBox: FC = () => {
 
   const {data, status, error, refetch, fetchNextPage, isRefetching} = useInfiniteQuery({
     queryKey: [ApiKeys.activityList],
-    queryFn: ({pageParam = 1}) => Api.activityApi.getActivities(pageParam, 12),
+    queryFn: ({pageParam = 1}) => Api.activityApi.getActivities(pageParam, 5),
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages, lastPageParam) => {
-      console.log(lastPage)
-      // if (!lastPage.activities || !lastPage?.activities?.length) return undefined
-      // // setTotal(lastPage.total)
+      if (!lastPage.activities || !lastPage?.activities?.length) return undefined
       return lastPageParam + 1
     }
   })
@@ -28,13 +26,14 @@ const MessageBox: FC = () => {
       <div className="w-full flex flex-row justify-between items-center">
         <div className="text-base font-semibold">互动消息</div>
       </div>
-      <div className="w-full flex flex-col justify-start items-center gap-2 overflow-auto ">
+      <div className="grow-0 overflow-scroll" id="message_box_id">
         {status == 'pending' && <div className="w-full text-center m-auto">加载中...</div>}
         {status == 'error' && <div className="w-full text-center m-auto">加载失败</div>}
         {data && data.pages[0]?.activities && 
           data.pages[0].activities.length > 0
         ? <InfiniteScroll
-          hasMore={true}
+          className="h-full"
+          hasMore={data.pages[data.pages.length - 1].hasMore}
           dataLength={data?.pages.reduce((total, page) => total + page.activities.length, 0) || 0}
           next={() => {
             console.log("refetch next")
@@ -47,12 +46,15 @@ const MessageBox: FC = () => {
           endMessage = {
             <div className="w-full row-center text-sm text-gray-400">之后没有活动了哦~</div>
           }
+          scrollableTarget = "message_box_id"
         >
+          <div className="w-full flex flex-col justify-start items-center gap-2 overflow-scroll">
           {
             data.pages.map((innerData) => {
               return innerData.activities.map((item) => <MessageCard {...item}></MessageCard>)
             })
           }
+          </div>
         </InfiniteScroll>
         
         : <Empty
