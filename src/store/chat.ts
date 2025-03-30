@@ -3,6 +3,7 @@ import { create } from "zustand";
 
 // 定义组件所需的消息格式
 interface ChatMessage {
+  typing: boolean; // 是否正在输入
   key: number;
   role: "ai" | "user";
   content: string;
@@ -24,11 +25,13 @@ const getSenderRole = (senderType: string): "ai" | "user" => {
   return senderType === "0" || String(senderType) === "0" ? "ai" : "user";
 };
 
-// 将后端消息格式转换为组件所需格式
-const convertMessageToChatMessage = (message: Message): ChatMessage => {
+// 将后端消息格式转换为组件所需格式，默认启用typing
+const convertMessageToChatMessage = (message: Message, keepTyping: boolean = true): ChatMessage => {
+  const role = getSenderRole(message.senderType);
   return {
+    typing: role === "ai" && keepTyping, // 只有AI消息才有typing效果，且根据参数决定是否开启
     key: message.messageId,
-    role: getSenderRole(message.senderType),
+    role: role,
     content: message.content,
     timestamp: new Date(message.sendTime),
     loading: false
@@ -66,7 +69,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
       const newRawMessages = [...state.rawMessages, newRawMessage];
       return {
         rawMessages: newRawMessages,
-        messages: newRawMessages.map(convertMessageToChatMessage),
+        messages: newRawMessages.map(msg => convertMessageToChatMessage(msg, true)), // 启用typing
       };
     }),
   clearMessages: () => set({ rawMessages: [], messages: [] }),
@@ -75,12 +78,12 @@ const useChatStore = create<ChatStore>((set, get) => ({
       const newRawMessages = state.rawMessages.filter((msg) => msg.messageId !== messageId);
       return {
         rawMessages: newRawMessages,
-        messages: newRawMessages.map(convertMessageToChatMessage),
+        messages: newRawMessages.map(msg => convertMessageToChatMessage(msg)),
       };
     }),
   setMessages: (newRawMessages) => set({
     rawMessages: newRawMessages,
-    messages: newRawMessages.map(convertMessageToChatMessage),
+    messages: newRawMessages.map(msg => convertMessageToChatMessage(msg, false)), // 禁用typing
   }),
   setMessage: (messageId, content) =>
     set((state) => {
@@ -93,9 +96,20 @@ const useChatStore = create<ChatStore>((set, get) => ({
       const newRawMessages = state.rawMessages.map((msg) =>
         msg.messageId === messageId ? { ...msg, content } : msg
       );
+      
+      // 保持之前的typing状态
+      const updatedMessages = newRawMessages.map((rawMsg) => {
+        const existingMsg = state.messages.find(m => m.key === rawMsg.messageId);
+        const isAi = getSenderRole(rawMsg.senderType) === "ai";
+        return {
+          ...convertMessageToChatMessage(rawMsg, true),
+          typing: isAi && (existingMsg ? existingMsg.typing : true)
+        };
+      });
+      
       return {
         rawMessages: newRawMessages,
-        messages: newRawMessages.map(convertMessageToChatMessage),
+        messages: updatedMessages,
       };
     }),
   setMessageLoading: (messageId, loading) =>
