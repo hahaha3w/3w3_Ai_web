@@ -6,6 +6,7 @@ import { createImmerStore } from "./factory";
 interface RefetchState {
   refetchMemoirList: (() => void)| null 
   refetchActionList: (() => void) | null
+  refetchAll: (() => void) | null
 }
 
 interface RefetchActions {
@@ -16,7 +17,11 @@ interface RefetchActions {
 export const useRefetchStore = createImmerStore<RefetchState, RefetchActions>(
   {
     refetchMemoirList: null,
-    refetchActionList: null
+    refetchActionList: null,
+    refetchAll() {
+      if (this.refetchMemoirList) this.refetchMemoirList()
+      if (this.refetchActionList) this.refetchActionList()
+    },
   },
   (set) => ({
     setRefetchMemoirList: (refetchState) => {

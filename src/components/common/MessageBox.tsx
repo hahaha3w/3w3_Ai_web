@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, use, useEffect } from "react"
 import { mockData } from "../home/Activity/ActivityType"
 import MessageCard from "./MessageCard"
 import { ApiKeys } from "@/constants/apiKeys"
@@ -6,11 +6,12 @@ import Api from "@/service/api"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { Empty } from "antd"
 import InfiniteScroll from "react-infinite-scroll-component"
+import { useRefetchStore } from "@/store/refetch"
 
 
 
 const MessageBox: FC = () => {
-
+  const {setRefetchActionList} = useRefetchStore()
   const {data, status, error, refetch, fetchNextPage, isRefetching} = useInfiniteQuery({
     queryKey: [ApiKeys.activityList],
     queryFn: ({pageParam = 1}) => Api.activityApi.getActivities(pageParam, 5),
@@ -20,6 +21,11 @@ const MessageBox: FC = () => {
       return lastPageParam + 1
     }
   })
+
+  useEffect(() => {
+    setRefetchActionList(refetch)
+  },[refetch, setRefetchActionList])
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-start gap-2 bg-white rounded-2xl p-4 shadow ">
       {/* Title */}
