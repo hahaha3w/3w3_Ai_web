@@ -10,14 +10,28 @@ interface ChatMessage {
   loding: boolean;
 }
 
+// 处理 senderType，将特殊字符映射为正确的角色
+const getSenderRole = (senderType: string): "ai" | "user" => {
+  // \u0001 表示用户，\u0002 表示 AI
+  if (senderType === "\u0001") return "user";
+  if (senderType === "\u0002") return "ai";
+
+  // 兼容之前的字符串类型
+  if (senderType === "user") return "user";
+  if (senderType === "ai") return "ai";
+
+  // 默认情况, 根据用户ID判断: 0为AI，其他为用户
+  return senderType === "0" || String(senderType) === "0" ? "ai" : "user";
+};
+
 // 将后端消息格式转换为组件所需格式
 const convertMessageToChatMessage = (message: Message): ChatMessage => {
   return {
     key: message.messageId,
-    role: message.senderType === "ai" ? "ai" : "user",
+    role: getSenderRole(message.senderType),
     content: message.content,
     timestamp: new Date(message.sendTime),
-    loding: true
+    loding: false
   };
 };
 
@@ -27,6 +41,7 @@ interface ChatStore {
   rawMessages: Message[]; // 原始消息格式
   chatList: Conversation[];
   currentChatId: number | null;
+  loadingHistory: boolean;
   addMessage: (message: Message) => void;
   clearMessages: () => void;
   deleteMessage: (messageId: number) => void;
@@ -34,14 +49,16 @@ interface ChatStore {
   setMessage: (messageId: number, content: string) => void;
   setCurrentChat: (conversationId: number) => void;
   setChatList: (newChatList: Conversation[]) => void;
+  setLoadingHistory: (loading: boolean) => void;
 }
 
 // 创建 Zustand store
 const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   rawMessages: [],
-  chatList: [], // 初始化为空数组，通过API获取真实数据
+  chatList: [],
   currentChatId: null,
+  loadingHistory: false,
   addMessage: (message) =>
     set((state) => {
       const newRawMessage = { ...message, sendTime: new Date().toISOString() };
@@ -71,7 +88,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
       if (targetMessage && targetMessage.content === content) {
         return state; // 内容没变，不触发更新
       }
-      
+
       const newRawMessages = state.rawMessages.map((msg) =>
         msg.messageId === messageId ? { ...msg, content } : msg
       );
@@ -82,6 +99,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
     }),
   setCurrentChat: (conversationId) => set({ currentChatId: conversationId }),
   setChatList: (newChatList) => set({ chatList: newChatList }),
+  setLoadingHistory: (loading) => set({ loadingHistory: loading }),
 }));
 
 export default useChatStore;

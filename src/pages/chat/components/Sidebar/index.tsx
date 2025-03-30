@@ -102,6 +102,7 @@ const Sidebar: React.FC<SidebarProps> = memo(
           message.error("创建对话失败，请稍后重试");
 
           // 创建失败时仍然重新获取对话列表
+
           await fetchConversationList();
 
           // 如果有现有对话，选择第一个
@@ -253,6 +254,8 @@ const Sidebar: React.FC<SidebarProps> = memo(
 
         // 显示加载状态
         setLoading(true);
+        // 设置历史记录加载状态
+        useChatStore.getState().setLoadingHistory(true);
 
         // 加载对话消息历史
         const response = await Api.chatApi.getMsgHistory({
@@ -274,7 +277,11 @@ const Sidebar: React.FC<SidebarProps> = memo(
         // 清空消息列表
         useChatStore.getState().clearMessages();
       } finally {
-        setLoading(false);
+        // 延迟取消加载状态，使加载动画更加平滑
+        setTimeout(() => {
+          useChatStore.getState().setLoadingHistory(false);
+          setLoading(false);
+        }, 300);
       }
     };
 
