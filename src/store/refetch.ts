@@ -1,11 +1,11 @@
-import { ActivityResData, MemoirResListData } from "@/service/api/home/types";
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
+import { ActivityResData, MemoirData, MemoirResListData } from "@/service/api/home/types";
+import { InfiniteData, QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { createImmerStore } from "./factory";
 
 
 interface RefetchState {
-  refetchMemoirList: ((options?: RefetchOptions) => Promise<QueryObserverResult<MemoirResListData, Error>>) | null 
-  refetchActionList: ((options?: RefetchOptions) => Promise<QueryObserverResult<ActivityResData, Error>>) | null
+  refetchMemoirList: (() => void)| null 
+  refetchActionList: (() => void) | null
 }
 
 interface RefetchActions {

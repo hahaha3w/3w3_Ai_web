@@ -9,8 +9,8 @@ class MemoirApi extends BaseApi {
   }
   tag = "MemoirApi"
 
-  async getMemoirList() {
-    const responseData = await this.http.get<MemoirResListData>(this.urls.memoirList)
+  async getMemoirList(pageParam: number, size: number) {
+    const responseData = await this.http.get<MemoirResListData>(this.urls.memoirList + `?page=${pageParam}&page_size=${size}`)
     console.log(responseData)
     return responseData.data
   }
