@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, memo } from "react";
 import ChatArea from "./components/ChatArea";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/Sidebar/";
 import { useMediaQuery } from "react-responsive";
 import styles from "./index.module.scss";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";

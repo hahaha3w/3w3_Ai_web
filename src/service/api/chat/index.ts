@@ -94,7 +94,7 @@ class Chat extends BaseApi {
   }
 
   deleteConversation(data: { conversationId: number }) {
-    return this.http.delete<DeleteConversationResData>(this.urls.conversation, { data });
+    return this.http.delete<DeleteConversationResData>(this.urls.conversation, { params: data });
   }
 }
 

@@ -40,32 +40,7 @@ interface ChatStore {
 const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   rawMessages: [],
-  chatList: [
-    {
-      conversationId: 1,
-      createTime: new Date().toISOString(),
-      mode: "chat",
-      sessionTitle: "与AI的对话",
-      userId: 123,
-      lastMessage: "你好！有什么可以帮您的吗？",
-    },
-    {
-      conversationId: 2,
-      createTime: new Date().toISOString(),
-      mode: "chat",
-      sessionTitle: "天气查询",
-      userId: 123,
-      lastMessage: "今天是晴天，温度在25℃左右。",
-    },
-    {
-      conversationId: 3,
-      createTime: new Date().toISOString(),
-      mode: "chat",
-      sessionTitle: "代码助手",
-      userId: 123,
-      lastMessage: "好的，请告诉我具体需求。",
-    },
-  ],
+  chatList: [], // 初始化为空数组，通过API获取真实数据
   currentChatId: null,
   addMessage: (message) =>
     set((state) => {
@@ -105,73 +80,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         messages: newRawMessages.map(convertMessageToChatMessage),
       };
     }),
-  setCurrentChat: (conversationId) =>
-    set(() => {
-      let mockRawMessages: Message[] = [];
-      if (conversationId === 1) {
-        mockRawMessages = [
-          {
-            messageId: 1,
-            conversationId: 1,
-            content: "你好，AI！",
-            sendTime: new Date().toISOString(),
-            senderType: "user",
-            userId: 123,
-          },
-          {
-            messageId: 2,
-            conversationId: 1,
-            content: "你好！有什么可以帮您的吗？",
-            sendTime: new Date().toISOString(),
-            senderType: "ai",
-            userId: 0,
-          },
-        ];
-      } else if (conversationId === 2) {
-        mockRawMessages = [
-          {
-            messageId: 3,
-            conversationId: 2,
-            content: "今天的天气怎么样？",
-            sendTime: new Date().toISOString(),
-            senderType: "user",
-            userId: 123,
-          },
-          {
-            messageId: 4,
-            conversationId: 2,
-            content: "今天是晴天，温度在25℃左右。",
-            sendTime: new Date().toISOString(),
-            senderType: "ai",
-            userId: 0,
-          },
-        ];
-      } else if (conversationId === 3) {
-        mockRawMessages = [
-          {
-            messageId: 5,
-            conversationId: 3,
-            content: "帮我写一段代码。",
-            sendTime: new Date().toISOString(),
-            senderType: "user",
-            userId: 123,
-          },
-          {
-            messageId: 6,
-            conversationId: 3,
-            content: "好的，请告诉我具体需求。",
-            sendTime: new Date().toISOString(),
-            senderType: "ai",
-            userId: 0,
-          },
-        ];
-      }
-      return {
-        currentChatId: conversationId,
-        rawMessages: mockRawMessages,
-        messages: mockRawMessages.map(convertMessageToChatMessage),
-      };
-    }),
+  setCurrentChat: (conversationId) => set({ currentChatId: conversationId }),
   setChatList: (newChatList) => set({ chatList: newChatList }),
 }));
 

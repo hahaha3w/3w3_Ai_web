@@ -38,6 +38,8 @@ export interface GetMsgHistoryResData {
 export interface Conversation {
   conversationId: number;
   createTime: string;
+  updatedAt: string;
+  createdAt: string;
   mode: string;
   sessionTitle: string;
   userId: number;
