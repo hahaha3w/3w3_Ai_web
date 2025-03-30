@@ -46,10 +46,17 @@ const MessageList = memo(
     const listRef = useRef<GetRef<typeof Bubble.List>>(null);
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
-    
+
     // Store 状态
-    const { messages, addMessage, currentChatId, setMessage, loadingHistory } = useChatStore();
-    
+    const {
+      messages,
+      addMessage,
+      currentChatId,
+      setMessage,
+      loadingHistory,
+      setMessageLoading,
+    } = useChatStore();
+
     // 引用变量
     const closeEventSource = useRef<(() => void) | null>(null);
     const aiResponseRef = useRef("");
@@ -78,10 +85,12 @@ const MessageList = memo(
         closeEventSource.current = null;
       }
       if (tempMessageIdRef.current) {
+        // 取消消息加载状态
+        setMessageLoading(tempMessageIdRef.current, false);
         tempMessageIdRef.current = null;
       }
       aiResponseRef.current = "";
-    }, []);
+    }, [setMessageLoading]);
 
     // 更新消息内容
     const updateMessageContent = useCallback(
@@ -131,6 +140,9 @@ const MessageList = memo(
           userId: 0,
         });
 
+        // 设置消息加载状态
+        setMessageLoading(tempMessageId, true);
+
         try {
           // 调用API发送消息
           const cleanup = await Api.chatApi.sendMsg(
@@ -151,6 +163,8 @@ const MessageList = memo(
                       tempMessageIdRef.current,
                       aiResponseRef.current
                     );
+                    // 取消消息加载状态
+                    setMessageLoading(tempMessageIdRef.current, false);
                     tempMessageIdRef.current = null;
                   }
 
@@ -181,6 +195,8 @@ const MessageList = memo(
                     tempMessageIdRef.current,
                     aiResponseRef.current
                   );
+                  // 取消消息加载状态
+                  setMessageLoading(tempMessageIdRef.current, false);
                   tempMessageIdRef.current = null;
                 }
 
@@ -205,6 +221,11 @@ const MessageList = memo(
               message.error("消息发送失败");
               setLoading(false);
 
+              // 发生错误时取消消息加载状态
+              if (tempMessageIdRef.current) {
+                setMessageLoading(tempMessageIdRef.current, false);
+              }
+
               if (closeEventSource.current) {
                 closeEventSource.current();
                 closeEventSource.current = null;
@@ -218,9 +239,20 @@ const MessageList = memo(
           console.error("发送消息出错:", error);
           message.error("消息发送失败");
           setLoading(false);
+
+          // 发生错误时取消消息加载状态
+          if (tempMessageIdRef.current) {
+            setMessageLoading(tempMessageIdRef.current, false);
+          }
         }
       },
-      [addMessage, currentChatId, oml2d, updateMessageContent]
+      [
+        addMessage,
+        currentChatId,
+        oml2d,
+        updateMessageContent,
+        setMessageLoading,
+      ]
     );
 
     // 聊天消息滚动到底部
@@ -229,7 +261,8 @@ const MessageList = memo(
         // 滚动到底部的逻辑
         const nativeElement = listRef.current.nativeElement;
         if (nativeElement) {
-          const scrollElement = nativeElement.querySelector('.ant-x-bubble-list');
+          const scrollElement =
+            nativeElement.querySelector(".ant-x-bubble-list");
           if (scrollElement) {
             setTimeout(() => {
               scrollElement.scrollTop = scrollElement.scrollHeight;
@@ -247,7 +280,7 @@ const MessageList = memo(
             <Spin tip="加载对话历史..." size="large" />
           </div>
         )}
-        
+
         {/* 消息气泡列表 */}
         <Bubble.List
           className={styles.bubbleListContainer}
@@ -255,7 +288,7 @@ const MessageList = memo(
           roles={rolesAsObject}
           items={messages}
         />
-        
+
         {/* 消息输入框 */}
         <Sender
           className="mt-4 bg-[rgba(0,0,0,0.5)]"
@@ -283,7 +316,15 @@ const MessageList = memo(
             }
 
             return (
-              <Tooltip title={value && !loadingHistory ? "发送 \u21B5" : loadingHistory ? "加载中..." : "请输入内容"}>
+              <Tooltip
+                title={
+                  value && !loadingHistory
+                    ? "发送 \u21B5"
+                    : loadingHistory
+                    ? "加载中..."
+                    : "请输入内容"
+                }
+              >
                 <SendButton
                   className={`${styles.sendButton}`}
                   variant="text"

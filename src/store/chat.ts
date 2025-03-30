@@ -7,7 +7,7 @@ interface ChatMessage {
   role: "ai" | "user";
   content: string;
   timestamp: Date;
-  loding: boolean;
+  loading: boolean;
 }
 
 // 处理 senderType，将特殊字符映射为正确的角色
@@ -31,7 +31,7 @@ const convertMessageToChatMessage = (message: Message): ChatMessage => {
     role: getSenderRole(message.senderType),
     content: message.content,
     timestamp: new Date(message.sendTime),
-    loding: false
+    loading: false
   };
 };
 
@@ -47,6 +47,7 @@ interface ChatStore {
   deleteMessage: (messageId: number) => void;
   setMessages: (newMessages: Message[]) => void;
   setMessage: (messageId: number, content: string) => void;
+  setMessageLoading: (messageId: number, loading: boolean) => void; // 新增方法
   setCurrentChat: (conversationId: number) => void;
   setChatList: (newChatList: Conversation[]) => void;
   setLoadingHistory: (loading: boolean) => void;
@@ -96,6 +97,13 @@ const useChatStore = create<ChatStore>((set, get) => ({
         rawMessages: newRawMessages,
         messages: newRawMessages.map(convertMessageToChatMessage),
       };
+    }),
+  setMessageLoading: (messageId, loading) =>
+    set((state) => {
+      const newMessages = state.messages.map((msg) =>
+        msg.key === messageId ? { ...msg, loading } : msg
+      );
+      return { messages: newMessages };
     }),
   setCurrentChat: (conversationId) => set({ currentChatId: conversationId }),
   setChatList: (newChatList) => set({ chatList: newChatList }),
