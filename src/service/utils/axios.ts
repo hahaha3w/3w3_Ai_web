@@ -1,6 +1,7 @@
 import { useTokenStore } from "@/store/token";
 import axios from "axios";
 import { camelToSnake } from "./snakeCaseHelper";
+import { useNavigate } from "react-router";
 
 const http = axios.create({
   baseURL: import.meta.env.VITE_SERVICE_BASE_URL, // 开发环境使用 /api，生产环境使用环境变量配置的 API 基础 URL
@@ -47,12 +48,33 @@ http.interceptors.response.use(
         return response.data;
       }
     }
+
+    // 处理服务器返回200但实际上是错误的情况（例如：返回code: 403）
+    if (response.data && response.data.code === 403) {
+      console.log("服务器返回403权限错误，正在跳转到登录页面");
+      // 清除token
+      useTokenStore.getState().clearToken();
+      // 跳转到登录页面
+      useNavigate()('/auth/login', { replace: true })
+      return Promise.reject(new Error('Unauthorized'));
+    }
+
     return response.data;
   },
   (error) => {
     // 处理响应错误
     console.error("API 错误:", error.response || error.message);
-    return Promise.reject(error);
+    // 处理响应错误
+    console.error("API 错误:", error.response || error.message);
+
+    // 处理 403 或 500 错误，跳转到登录页面
+    if (error.response && (error.response.status === 403 || error.response.status === 500)) {
+      console.log("权限错误或Token无效，正在跳转到登录页面");
+      // 清除token
+      useTokenStore.getState().clearToken();
+      // 跳转到登录页面
+      useNavigate()('/auth/login', { replace: true })
+    }
   }
 );
 
