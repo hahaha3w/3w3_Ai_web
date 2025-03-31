@@ -1,6 +1,6 @@
 import { authApi } from "./auth";
 import { chatApi } from "./chat";
-import { userApi } from "./user/user";
+import { userApi } from "./user";
 import { testApi } from "./test";
 import { memoirApi } from "./home/memoir";
 import { activityApi }from "./home/activity"

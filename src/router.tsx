@@ -1,12 +1,12 @@
 import { createHashRouter } from "react-router";
 import App from "./App";
-import ChangePasswordPage from "./pages/auth/changePassword"; // 新增的导入
+import ChangePasswordPage from "./pages/auth/changePassword";
 import LoginPage from "./pages/auth/login";
-import RegisterPage from "./pages/auth/register"; // 新增的导入
+import RegisterPage from "./pages/auth/register";
 import ChatPage from "./pages/chat";
 import HomePage from "./pages/home";
 import UserPage from "./pages/user";
-import NotFoundPage from "./pages/404"; // 新增的导入
+import NotFoundPage from "./pages/404";
 
 const router = createHashRouter([
   {
@@ -28,7 +28,7 @@ const router = createHashRouter([
     element: <ChatPage />
   },
   {
-    path: '/chat/:id', // 添加带有ID参数的聊天路由
+    path: '/chat/:id',
     element: <ChatPage />
   },
   {
@@ -36,15 +36,15 @@ const router = createHashRouter([
     element: <LoginPage />
   },
   {
-    path: '/auth/register', // 新增的路径
+    path: '/auth/register',
     element: <RegisterPage />
   },
   {
-    path: '/auth/changePassword', // 新增的路径
+    path: '/auth/changePassword',
     element: <ChangePasswordPage />
   },
   {
-    path: '*',  // 添加通配符路由用于404页面
+    path: '*',
     element: <NotFoundPage />
   }
 ]);
