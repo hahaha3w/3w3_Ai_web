@@ -17,7 +17,7 @@ interface TokenActions {
 export const useTokenStore = createPersistedStore<TokenState, TokenActions>(
   "user_token",
   {
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NDM3NzcyODIsImlzcyI6ImhhaGFoYTN3In0.IrReSEHgW_5vIpzzsbX5fvSVL3tunWfiRZ6Raq2B3Ik",
+    token: null,
     user: null,
     email: null,
   },

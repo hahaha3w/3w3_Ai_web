@@ -14,7 +14,7 @@ const NavBar = () => {
 
   const handleLogout = () => {
     // 清除本地存储的token
-    localStorage.removeItem("token");
+    localStorage.removeItem("user_token");
     // 重置认证状态
     resetAuth();
     // 显示消息提示

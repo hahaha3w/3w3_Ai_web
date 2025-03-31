@@ -7,6 +7,7 @@ import ChatPage from "./pages/chat";
 import HomePage from "./pages/home";
 import UserPage from "./pages/user";
 import NotFoundPage from "./pages/404";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createHashRouter([
   {
@@ -19,17 +20,17 @@ const router = createHashRouter([
       },
       {
         path: '/user',
-        element: <UserPage />
+        element: <ProtectedRoute><UserPage /></ProtectedRoute>
       }
     ]
   },
   {
     path: '/chat',
-    element: <ChatPage />
+    element: <ProtectedRoute><ChatPage /></ProtectedRoute>
   },
   {
     path: '/chat/:id',
-    element: <ChatPage />
+    element: <ProtectedRoute><ChatPage /></ProtectedRoute>
   },
   {
     path: '/auth/login',
