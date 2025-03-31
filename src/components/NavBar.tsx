@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import useAuthStore from "../store/auth";
 import MessageBox from "./common/MessageBox";
 import NavIcon from "./common/NavIcon";
+import logo from "/logo.svg"; // 导入logo图片
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -44,7 +45,10 @@ const NavBar = () => {
 
   return (
     <div className="w-full bg-white px-10 py-2 flex flex-row justify-between shadow">
-      <p className="text-2xl font-bold text-black">AI记忆录</p>
+      <div className="flex items-center">
+        <img src={logo} alt="logo" className="h-8 mr-2" />
+        <p className="text-2xl font-bold text-black">心忆灵伴</p>
+      </div>
       <div className="flex flex-row gap-3 mr-20">
         <Popover
           content={messageContent}

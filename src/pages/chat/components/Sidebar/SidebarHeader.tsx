@@ -9,7 +9,7 @@ interface SidebarHeaderProps {
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({ onClose }) => {
   return (
     <div className="flex justify-between items-center p-4 border-b border-gray-200">
-      <h2 className="text-xl text-gray-800 font-bold m-0">AI对话助手</h2>
+      <h2 className="text-xl text-gray-800 font-bold m-0">心忆灵伴</h2>
       <div className="flex gap-2">
         <Tooltip title="返回主页">
           <Button

@@ -51,10 +51,10 @@ const ChatPage = memo(() => {
       if (currentChat) {
         setTitle(`${currentChat.sessionTitle}`);
         // 更新页面标题
-        document.title = `${currentChat.sessionTitle} - AI对话助手`;
+        document.title = `${currentChat.sessionTitle} | 心忆灵伴`;
       } else {
-        setTitle("与猫娘的对话");
-        document.title = "与猫娘的对话 - AI对话助手";
+        setTitle("新对话");
+        document.title = "新对话 | 心忆灵伴";
       }
     } else if (id) {
       // 如果有ID但没有currentChatId(可能是初始加载)
@@ -63,10 +63,10 @@ const ChatPage = memo(() => {
         const chat = chatList.find(chat => chat.conversationId === chatId);
         if (chat) {
           setTitle(`${chat.sessionTitle}`);
-          document.title = `${chat.sessionTitle} - AI对话助手`;
+          document.title = `${chat.sessionTitle} | 心忆灵伴`;
         } else {
           setTitle(`新对话`);
-          document.title = "新对话 - AI对话助手";
+          document.title = "新对话 | 心忆灵伴";
         }
       }
     }
