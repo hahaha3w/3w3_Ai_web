@@ -21,7 +21,6 @@ export interface ChangePasswordReq {
 
 export interface DeleteAccountReq {
   password: string;
-  confirmText: string;
 }
 
 export interface LoginResData {

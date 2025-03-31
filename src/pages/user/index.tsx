@@ -12,18 +12,20 @@ import {
 } from "antd";
 import {
   UserOutlined,
-  LogoutOutlined,
+  DeleteOutlined,
   EditOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
 import useAuthStore from "../../store/auth";
 import { userApi } from "../../service/api/user";
+import { authApi } from "../../service/api/auth";
 import { useNavigate } from "react-router";
 
 const UserPage = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
   const { username, email, bio, useDay, setAuth, resetAuth } = useAuthStore();
   const navigate = useNavigate();
 
@@ -79,20 +81,35 @@ const UserPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    setLogoutModalVisible(true);
+  const handleDeleteAccount = () => {
+    setDeleteModalVisible(true);
   };
 
-  const confirmLogout = () => {
-    resetAuth();
-    localStorage.removeItem("token");
-    message.success("账号已注销，即将返回登录页面");
-    setLogoutModalVisible(false);
-    navigate("/login");
+  const confirmDeleteAccount = async () => {
+    if (!deletePassword) {
+      message.error("请输入密码");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await authApi.deleteAccount({ password: deletePassword });
+      resetAuth();
+      localStorage.removeItem("user_token");
+      message.success("账号已成功删除");
+      setDeleteModalVisible(false);
+      navigate("/auth/login");
+    } catch (error) {
+      message.error("删除账号失败，请检查密码是否正确");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const cancelLogout = () => {
-    setLogoutModalVisible(false);
+  const cancelDeleteAccount = () => {
+    setDeleteModalVisible(false);
+    setDeletePassword("");
   };
 
   return (
@@ -139,12 +156,12 @@ const UserPage = () => {
               <Button
                 type="primary"
                 danger
-                icon={<LogoutOutlined />}
-                onClick={handleLogout}
+                icon={<DeleteOutlined />}
+                onClick={handleDeleteAccount}
                 size="large"
                 className="hover:opacity-90 transition-opacity"
               >
-                注销账号
+                删除账号
               </Button>
             </div>
           </Spin>
@@ -216,20 +233,27 @@ const UserPage = () => {
       </div>
 
       <Modal
-        title={<span className="text-red-500 font-bold">确认注销</span>}
-        open={logoutModalVisible}
-        onOk={confirmLogout}
-        onCancel={cancelLogout}
-        okText="确认注销"
+        title={<span className="text-red-500 font-bold">删除账号确认</span>}
+        open={deleteModalVisible}
+        onOk={confirmDeleteAccount}
+        onCancel={cancelDeleteAccount}
+        okText="确认删除"
         cancelText="取消"
         okButtonProps={{ danger: true }}
         centered
-        className="user-logout-modal"
+        className="user-delete-modal"
       >
         <div className="py-4">
-          <p className="text-lg">
-            确定要注销当前账号吗？注销后将返回登录页面。
+          <p className="text-lg mb-4">
+            警告：删除账号是不可逆操作，所有数据将被永久删除！请谨慎操作。
           </p>
+          <p className="mb-4">请输入您的密码以确认删除账号：</p>
+          <Input.Password
+            placeholder="请输入密码"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            className="w-full"
+          />
         </div>
       </Modal>
     </div>

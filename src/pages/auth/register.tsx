@@ -49,7 +49,8 @@ const RegisterPage: React.FC = () => {
         startCountdown();
       }
     } catch (error: any) {
-      message.error(error.message || '发送验证码失败，请重试');
+      console.error('发送验证码失败', error);
+      message.error('发送验证码失败，请重试');
     } finally {
       setSendingCode(false);
     }
@@ -66,7 +67,8 @@ const RegisterPage: React.FC = () => {
         navigate('/auth/login'); // 注册成功后跳转到登录页
       }
     } catch (error: any) {
-      message.error(error.message || '注册失败，请重试');
+      console.error('注册失败', error);
+      message.error('注册失败，请检查您邮箱是否已被注册，或验证码是否正确');
     } finally {
       setLoading(false);
     }

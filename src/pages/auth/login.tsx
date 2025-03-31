@@ -43,7 +43,8 @@ const LoginPage: React.FC = () => {
         navigate("/"); // 登录成功后跳转
       }
     } catch (error: any) {
-      message.error(error.message || "登录失败，请重试");
+      console.error("登录失败", error);
+      message.error("登录失败，请检查您的邮箱和密码");
     } finally {
       setLoading(false);
     }

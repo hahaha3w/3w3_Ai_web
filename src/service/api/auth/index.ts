@@ -18,7 +18,7 @@ class Auth extends BaseApi {
     register: "/user/register",
     sendCode: "/user/send-code",
     changePassword: "/user/change-password",
-    deleteAccount: "/user/delete",
+    deleteAccount: "/user",
     getUserInfo: "/user/info"
   };
 
