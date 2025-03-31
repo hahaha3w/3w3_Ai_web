@@ -68,7 +68,7 @@ http.interceptors.response.use(
     console.error("API 错误:", error.response || error.message);
 
     // 处理 403 或 500 错误，跳转到登录页面
-    if (error.response && (error.response.status === 403 || error.response.status === 500)) {
+    if (error.response && (error.response.status === 403)) {
       console.log("权限错误或Token无效，正在跳转到登录页面");
       // 清除token
       useTokenStore.getState().clearToken();
