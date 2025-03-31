@@ -140,8 +140,8 @@ const Sidebar: React.FC<SidebarProps> = memo(
             sessionTitle: `新对话`,
           });
 
-          if (response.data && response.data.conversation) {
-            const newChat = response.data.conversation;
+          if (response.data) {
+            const newChat = response.data
 
             // 创建成功后重新获取对话列表
             await fetchConversationList();

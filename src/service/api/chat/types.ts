@@ -1,5 +1,6 @@
 export interface SendMsgReq {
   content: string;
+  mode: string;
   conversationId: number;
   [property: string]: any;
 }
@@ -37,7 +38,6 @@ export interface GetMsgHistoryResData {
 
 export interface Conversation {
   conversationId: number;
-  createTime: string;
   updatedAt: string;
   createdAt: string;
   mode: string;
@@ -52,8 +52,7 @@ export interface CreatecConversationReq {
   [property: string]: any;
 }
 
-export interface CreatecConversationResData {
-  conversation: Conversation;
+export interface CreatecConversationResData extends Conversation {
   [property: string]: any;
 }
 
@@ -66,6 +65,7 @@ export interface GetConversationListReq {
 export interface GetConversationListResData {
   conversations: Conversation[];
   total: number;
+  hasMore: boolean;
   [property: string]: any;
 }
 

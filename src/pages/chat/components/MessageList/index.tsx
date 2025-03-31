@@ -8,6 +8,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import styles from "../ChatArea.module.scss";
 import markdownit from "markdown-it";
 import "./MarkdownStyles.scss";
+import useMood from "@/hooks/useMood";
 
 // 初始化markdown-it
 const md = markdownit({ html: true, breaks: true });
@@ -57,6 +58,11 @@ const MessageList = memo(
     const listRef = useRef<GetRef<typeof Bubble.List>>(null);
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
+    const { mood } = useMood();
+
+    useEffect(() => {
+      console.log("Mood changed:", mood);
+    }, [mood])
 
     // Store 状态
     const {
@@ -156,10 +162,12 @@ const MessageList = memo(
 
         try {
           // 调用API发送消息
+          console.log("开始发送消息:", content, currentChatId, mood);
           const cleanup = await Api.chatApi.sendMsg(
             {
               content,
               conversationId: currentChatId,
+              mode: mood,
             },
             (data) => {
               // 检查消息内容
@@ -261,6 +269,7 @@ const MessageList = memo(
         addMessage,
         currentChatId,
         oml2d,
+        mood,
         updateMessageContent,
         setMessageLoading,
       ]

@@ -84,8 +84,8 @@ const ChatList: React.FC<ChatListProps> = ({
           .sort((a, b) => {
             // 完全按照更新时间排序，最新更新的排在最前面
             return (
-              new Date(b.updatedAt || b.createTime).getTime() -
-              new Date(a.updatedAt || a.createTime).getTime()
+              new Date(b.updatedAt || b.createdAt).getTime() -
+              new Date(a.updatedAt || a.createdAt).getTime()
             );
           })
           .map((chat: Conversation) => (
@@ -108,7 +108,7 @@ const ChatList: React.FC<ChatListProps> = ({
                     {chat.sessionTitle}
                   </span>
                   <span className="text-gray-500 text-xs truncate">
-                    {formatTime(chat.updatedAt || chat.createTime)}
+                    {formatTime(chat.updatedAt || chat.createdAt)}
                   </span>
                 </div>
                 <Popconfirm
