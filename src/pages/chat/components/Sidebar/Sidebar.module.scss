@@ -243,7 +243,7 @@ button {
   cursor: pointer;
   margin: 0 2px;
   transition: all 0.2s ease;
-  padding: 6px 2px; // 减小内边距
+  padding: 6px 4px; // 减小内边距
   border-radius: 8px;
   box-sizing: border-box;
   width: 52px; // 设置固定宽度
@@ -264,7 +264,7 @@ button {
   }
   
   .moodEmoji {
-    font-size: 1.75rem; // 稍微缩小字体大小
+    font-size: 1.25rem; // 稍微缩小字体大小
     display: block;
     margin-bottom: 2px; // 减小底部间距
     transition: transform 0.2s ease;

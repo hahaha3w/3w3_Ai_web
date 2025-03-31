@@ -23,8 +23,8 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ mood, onSetMood }) => {
         <h3 className="text-base font-medium">今日心情</h3>
       </div>
 
-      <div className="flex justify-between px-2 mt-2">
-        {(["happy", "sad", "angry", "tired"] as MoodType[]).map(
+      <div className="flex justify-between mt-2">
+        {(["happy", "sad", "angry", "tired", "neutral"] as MoodType[]).map(
           (moodType) => (
             <div
               key={moodType}
