@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import BaseApi from "../shared";
-import { MemoirData, MemoirDeleteRes, MemoirResData, MemoirResListData } from "./types";
+import { GenerateMemoryReq, MemoirData, MemoirDeleteRes, MemoirResData, MemoirResListData } from "./types";
 
 class MemoirApi extends BaseApi {
   urls = {
@@ -8,6 +8,11 @@ class MemoirApi extends BaseApi {
     memoir: "/memoir"
   }
   tag = "MemoirApi"
+
+  async generateMemory(data: GenerateMemoryReq) {
+    const responseData = await this.http.post(this.urls.memoir, data)
+    return responseData.data
+  }
 
   async getMemoirList(pageParam: number, size: number) {
     const responseData = await this.http.get<MemoirResListData>(this.urls.memoirList + `?page=${pageParam}&page_size=${size}`)

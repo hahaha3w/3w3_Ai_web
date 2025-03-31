@@ -40,6 +40,13 @@ export interface MemoirData {
   createdAt: string,
 }
 
+export interface GenerateMemoryReq {
+  type: "Memoir",
+  style: string,
+  startDate: string,
+  endDate: string,
+}
+
 export interface MemoirResListData {
   memoirs: MemoirData[],
   total: number,

@@ -1,4 +1,5 @@
 import Oml2d from "@/components/Oml2d";
+import zhCN from "antd/locale/zh_CN";
 import { ConfigProvider, theme } from "antd";
 import { Oml2dEvents, Oml2dMethods, Oml2dProperties } from "oh-my-live2d";
 import React from "react";
@@ -24,7 +25,7 @@ const ChatArea = ({
   setOml2d,
 }: ChatAreaProps) => {
   return (
-    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+    <ConfigProvider locale={zhCN} theme={{ algorithm: theme.darkAlgorithm }}>
       <div
         className={`relative text-gray-50 w-full h-full overflow-hidden rounded-lg shadow-xl ${styles.chatContainer}`}
       >
