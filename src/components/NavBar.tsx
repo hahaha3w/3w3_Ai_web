@@ -1,7 +1,4 @@
 import NavIcon from "./common/NavIcon";
-import chat from "../assets/chat.svg";
-import home from "../assets/home.svg";
-import messageIcon from "../assets/message.svg";
 import MessageBox from "./common/MessageBox";
 import { Button, Popover, message } from "antd";
 import { useNavigate } from "react-router";
@@ -30,7 +27,7 @@ const NavBar = () => {
         <div className="relative group">
           <NavIcon
             onClick={() => {}}
-            iconImg={messageIcon}
+            icon="mdi:message-outline"
             iconText="消息"
           ></NavIcon>
           <div className="w-[400px] h-[500px] absolute top-[110%] left-[-200px] invisible group-hover:visible">
@@ -40,29 +37,15 @@ const NavBar = () => {
 
         <NavIcon
           onClick={() => navigate("/")}
-          iconImg={home}
+          icon="mdi:home-outline"
           iconText="主页"
         ></NavIcon>
 
-        <Popover
-          content={
-            <div className="col-center gap-3">
-              <Button type="primary" danger onClick={handleLogout}>
-                退出登录
-              </Button>
-            </div>
-          }
-          placement="bottom"
-          trigger="hover"
-        >
-          <div
-            className="flex flex-col items-center cursor-pointer"
-            onClick={() => navigate("/user")}
-          >
-            <Icon icon="mdi:account-circle-outline" width="24" height="24" />
-            <span className="text-xs">用户中心</span>
-          </div>
-        </Popover>
+        <NavIcon
+          onClick={() => navigate("/user")}
+          icon="mdi:account-circle-outline"
+          iconText="用户中心"
+        ></NavIcon>
       </div>
     </div>
   );

@@ -1,17 +1,31 @@
 import { useState, useEffect } from "react";
-import { Card, Form, Input, Button, Avatar, Upload, message, Spin } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { Icon } from "@iconify-icon/react/dist/iconify.js";
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  message,
+  Spin,
+  Avatar,
+  Modal,
+  Divider,
+} from "antd";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  EditOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import useAuthStore from "../../store/auth";
 import { userApi } from "../../service/api/user";
-import { UploadChangeParam } from "antd/lib/upload";
-import { UploadFile } from "antd/lib/upload/interface";
+import { useNavigate } from "react-router";
 
 const UserPage = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const { username, email, avatar, bio, useDay, setAuth } = useAuthStore();
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const { username, email, bio, useDay, setAuth, resetAuth } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserInfo();
@@ -32,7 +46,6 @@ const UserPage = () => {
         userId: userInfo.userId,
         username: userInfo.username,
         email: userInfo.email,
-        avatar: userInfo.avatar,
         bio: userInfo.bio,
         theme: userInfo.theme as "light" | "dark",
         useDay: userInfo.useDay,
@@ -51,7 +64,7 @@ const UserPage = () => {
       await userApi.updateUserInfo({
         username: values.username,
         bio: values.bio,
-        avatar, // 使用当前头像
+        avatar: "",
       });
       setAuth({
         username: values.username,
@@ -66,97 +79,134 @@ const UserPage = () => {
     }
   };
 
-  const handleAvatarChange = async (
-    info: UploadChangeParam<UploadFile<any>>
-  ) => {
-    if (info.file.status === "uploading") {
-      setUploading(true);
-      return;
-    }
-    if (info.file.status === "done") {
-      setUploading(false);
-      // 假设服务器返回的是上传后的图片URL
-      const avatarUrl = info.file.response.url;
-      try {
-        await userApi.updateUserInfo({
-          username,
-          bio,
-          avatar: avatarUrl,
-        });
-        setAuth({ avatar: avatarUrl });
-        message.success("头像更新成功");
-      } catch (error) {
-        message.error("头像更新失败");
-        console.error(error);
-      }
-    }
+  const handleLogout = () => {
+    setLogoutModalVisible(true);
   };
 
-  const uploadButton = (
-    <div>
-      {uploading ? <Spin size="small" /> : <UploadOutlined />}
-      <div style={{ marginTop: 8 }}>上传头像</div>
-    </div>
-  );
+  const confirmLogout = () => {
+    resetAuth();
+    localStorage.removeItem("token");
+    message.success("账号已注销，即将返回登录页面");
+    setLogoutModalVisible(false);
+    navigate("/login");
+  };
+
+  const cancelLogout = () => {
+    setLogoutModalVisible(false);
+  };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">用户中心</h1>
-      <div className="flex flex-col md:flex-row gap-6">
-        <Card title="个人信息" className="flex-1">
+    <div className="container mx-auto p-6 max-w-6xl">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
+        <UserOutlined className="mr-2" />
+        用户中心
+      </h1>
+      <div className="flex flex-col md:flex-row gap-8">
+        <Card
+          title={
+            <span className="text-xl font-semibold text-gray-700">
+              个人信息
+            </span>
+          }
+          className="flex-1 shadow-md hover:shadow-lg transition-shadow duration-300"
+          bordered={false}
+          style={{ borderRadius: "12px", overflow: "hidden" }}
+        >
           <Spin spinning={loading}>
             <div className="flex flex-col items-center mb-6">
               <Avatar
-                size={100}
-                icon={<Icon icon="mdi:account" width="60" height="60" />}
-                src={avatar}
-                className="mb-3"
+                size={110}
+                icon={<UserOutlined />}
+                className="mb-5 bg-blue-500 shadow-md hover:scale-105 transition-all duration-300"
               />
-              <Upload
-                name="avatar"
-                action="/api/user/avatar" // 上传头像的API地址
-                showUploadList={false}
-                onChange={handleAvatarChange}
+              <p className="text-center text-xl font-medium mb-2">{username}</p>
+              <p className="text-center text-gray-500 mb-3">{email}</p>
+
+              <div className="bg-blue-50 rounded-lg px-6 py-3 mb-5 w-full text-center">
+                <p className="text-blue-700 font-medium">
+                  已使用天数: <span className="text-lg">{useDay}</span> 天
+                </p>
+              </div>
+
+              <Divider className="my-4">个人简介</Divider>
+
+              <div className="bg-gray-50 rounded-lg p-4 mb-6 w-full">
+                <p className="text-center text-gray-700 italic">
+                  {bio || "这个人很懒，还没有填写个人简介"}
+                </p>
+              </div>
+
+              <Button
+                type="primary"
+                danger
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+                size="large"
+                className="hover:opacity-90 transition-opacity"
               >
-                <Button icon={<UploadOutlined />}>更换头像</Button>
-              </Upload>
+                注销账号
+              </Button>
             </div>
-            <p className="text-center text-lg font-medium mb-1">{username}</p>
-            <p className="text-center text-gray-500 mb-4">{email}</p>
-            <p className="text-center mb-6">已使用天数: {useDay}天</p>
-            <p className="text-center mb-4">
-              {bio || "这个人很懒，还没有填写个人简介"}
-            </p>
           </Spin>
         </Card>
 
-        <Card title="编辑个人信息" className="flex-1">
+        <Card
+          title={
+            <span className="text-xl font-semibold text-gray-700">
+              <EditOutlined className="mr-2" />
+              编辑个人信息
+            </span>
+          }
+          className="flex-1 shadow-md hover:shadow-lg transition-shadow duration-300"
+          bordered={false}
+          style={{ borderRadius: "12px", overflow: "hidden" }}
+        >
           <Spin spinning={loading}>
             <Form
               form={form}
               layout="vertical"
               onFinish={handleSubmit}
               initialValues={{ username, bio }}
+              className="p-2"
             >
               <Form.Item
                 name="username"
-                label="用户名"
+                label={
+                  <span className="text-gray-700 font-medium">用户名</span>
+                }
                 rules={[{ required: true, message: "请输入用户名" }]}
               >
-                <Input placeholder="请输入新的用户名" />
-              </Form.Item>
-
-              <Form.Item name="bio" label="个人简介">
-                <Input.TextArea
-                  placeholder="介绍一下自己吧"
-                  rows={4}
-                  maxLength={200}
-                  showCount
+                <Input
+                  placeholder="请输入新的用户名"
+                  size="large"
+                  className="rounded-lg"
                 />
               </Form.Item>
 
-              <Form.Item>
-                <Button type="primary" htmlType="submit" block>
+              <Form.Item
+                name="bio"
+                label={
+                  <span className="text-gray-700 font-medium">个人简介</span>
+                }
+              >
+                <Input.TextArea
+                  placeholder="介绍一下自己吧"
+                  rows={5}
+                  maxLength={200}
+                  showCount
+                  className="rounded-lg"
+                />
+              </Form.Item>
+
+              <Form.Item className="mt-6">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  size="large"
+                  icon={<SaveOutlined />}
+                  className="rounded-lg h-12 font-medium text-base hover:opacity-90 transition-opacity"
+                >
                   保存修改
                 </Button>
               </Form.Item>
@@ -164,6 +214,24 @@ const UserPage = () => {
           </Spin>
         </Card>
       </div>
+
+      <Modal
+        title={<span className="text-red-500 font-bold">确认注销</span>}
+        open={logoutModalVisible}
+        onOk={confirmLogout}
+        onCancel={cancelLogout}
+        okText="确认注销"
+        cancelText="取消"
+        okButtonProps={{ danger: true }}
+        centered
+        className="user-logout-modal"
+      >
+        <div className="py-4">
+          <p className="text-lg">
+            确定要注销当前账号吗？注销后将返回登录页面。
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 };
